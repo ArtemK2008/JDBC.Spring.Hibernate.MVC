@@ -26,13 +26,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.menu.ConsoleMenu;
 import com.kalachev.task7.utilities.ConnectionManager;
@@ -47,6 +49,8 @@ class ConsoleMenuIT {
   Scanner mockScanner;
   @SpyBean
   Initializer spyInitializer;
+  @Autowired
+  ApplicationEventPublisher publisher;
   private final PrintStream standardOut = System.out;
   ByteArrayOutputStream outputStreamCaptor;
   final static String NEWLINE = System.lineSeparator();
@@ -200,7 +204,6 @@ class ConsoleMenuIT {
     assertEquals("no such course", outputLines[19]);
   }
 
-  @DirtiesContext
   @Test
   void testConsoleMenu_shouldAddStudentToDatabase_whenUserAsksToInsert()
       throws Exception {
@@ -231,6 +234,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsNotInt()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(NOT_AN_INTEGER).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -253,6 +257,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsOutOfRange()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(HUGE_INT).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -271,11 +276,11 @@ class ConsoleMenuIT {
     assertEquals(200, countAfter);
   }
 
-  @DirtiesContext
   @Test
   void testConsoleMenu_shouldDeleteStudentFromDatabase_whenUserAsksToDelete()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     String expectedMessage = "student with id " + STUDENT_TO_DELETE_ID
         + " deleted";
     Mockito.when(mockScanner.next()).thenReturn("4")
@@ -302,6 +307,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdIsNotInt()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NOT_AN_INTEGER)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -324,6 +330,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotExists()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(HUGE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -346,6 +353,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenNegaiveId()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NEGAGTIVE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -364,7 +372,6 @@ class ConsoleMenuIT {
     assertEquals(200, countAfter);
   }
 
-  @DirtiesContext
   @Test
   void testConsoleMenu_shouldAddStudentToCourse_whenUserAsksToAddToCourse()
       throws Exception {
@@ -402,6 +409,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenCourseNameWasWrong()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(COURSE + "is worng").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -500,7 +508,6 @@ class ConsoleMenuIT {
     assertEquals(coursesNumberAfter, coursesNumberBefore);
   }
 
-  @DirtiesContext
   @Test
   void testConsoleMenu_shouldRemoveStudentFromCourse_whenUserAsksToDelete()
       throws Exception {
