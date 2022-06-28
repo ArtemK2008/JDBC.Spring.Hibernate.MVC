@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.dao.CoursesDao;
 import com.kalachev.task7.dao.entities.Course;
 
 @ExtendWith(SpringExtension.class)
