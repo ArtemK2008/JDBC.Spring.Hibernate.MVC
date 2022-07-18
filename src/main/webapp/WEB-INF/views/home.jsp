@@ -1,15 +1,20 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page session="false" %>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Spittr</title>
+<title>School management</title>
 <link rel="stylesheet"
 type="text/css"
-href="<c:url value="/resources/style.css" />" >
+th:href="@{/resources/style.css}"></link>
 </head>
 <body>
-<h1>Welcome to Spittr</h1>
-<a href="<c:url value="/spittles" />">Spittles</a> |
-<a href="<c:url value="/spitter/register" />">Register</a>
+<h1>Welcome</h1>
+<a th:href="@{/spittles}">1</a> |
+<a th:href="@{/spittles}">2</a> |
+<a th:href="@{/spittles}">3</a> |
+<a th:href="@{/spittles}">4</a> |
+<a th:href="@{/spittles}">5</a> |
+<a th:href="@{/spittles}">6</a> |
+<a th:href="@{/spittles}">7</a> |
+<a th:href="@{/spitter/register}">Register</a>
 </body>
-</html>  
+</html>

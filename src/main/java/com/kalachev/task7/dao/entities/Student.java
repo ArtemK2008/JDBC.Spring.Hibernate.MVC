@@ -2,10 +2,20 @@ package com.kalachev.task7.dao.entities;
 
 import java.util.Objects;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class Student {
   private int id;
-  private int groupdId;
+
+  private int groupId;
+
+  @NotNull
+  @NotBlank
   private String firstName;
+
+  @NotNull
+  @NotBlank
   private String lastName;
 
   public int getId() {
@@ -16,12 +26,12 @@ public class Student {
     this.id = id;
   }
 
-  public int getGroupdId() {
-    return groupdId;
+  public int getGroupId() {
+    return groupId;
   }
 
   public void setGroupdId(int groupdId) {
-    this.groupdId = groupdId;
+    this.groupId = groupdId;
   }
 
   public String getFirstName() {
@@ -62,7 +72,7 @@ public class Student {
 
   @Override
   public String toString() {
-    return "Student [id=" + id + ", groupdId=" + groupdId + ", firstName="
+    return "Student [id=" + id + ", groupdId=" + groupId + ", firstName="
         + firstName + ", lastName=" + lastName + "]";
   }
 

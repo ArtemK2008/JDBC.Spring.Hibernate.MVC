@@ -10,7 +10,6 @@ import com.kalachev.task7.ui.menu.ConsoleMenu;
 public class AppRunner {
 
   public static void main(String[] args) {
-
     ApplicationContext context = new AnnotationConfigApplicationContext(
         ConsoleAppConfig.class);
     ConsoleMenu menu = (ConsoleMenu) context.getBean("consoleMenu");

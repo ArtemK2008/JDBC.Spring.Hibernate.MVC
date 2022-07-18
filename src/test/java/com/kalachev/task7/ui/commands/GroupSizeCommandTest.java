@@ -37,9 +37,8 @@ class GroupSizeCommandTest {
   static GroupInitializer groupInitializer = new GroupInitializerImpl();
   static CoursesInitializer coursesInitializer = new CoursesInitializerImpl();
   static SchemaInitializer schemaInitializer = new SchemaInitializerImpl();
-  static InitializerImpl initializer = new InitializerImpl(
-      studentInitializer, coursesInitializer, groupInitializer,
-      schemaInitializer);
+  static InitializerImpl initializer = new InitializerImpl(studentInitializer,
+      coursesInitializer, groupInitializer, schemaInitializer);
 
   @BeforeAll
   static void startUp() {

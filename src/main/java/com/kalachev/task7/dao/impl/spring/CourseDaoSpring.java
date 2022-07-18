@@ -57,7 +57,7 @@ public class CourseDaoSpring implements CoursesDao {
     }
     boolean isAdded = false;
     jdbcOperations.update(ADD_STUDENT_TO_COURSE, student.getId(),
-        student.getGroupdId(), student.getFirstName(), student.getLastName(),
+        student.getGroupId(), student.getFirstName(), student.getLastName(),
         thisCourse.getCourseName(), thisCourse.getCourseDescription());
     isAdded = true;
     return isAdded;
