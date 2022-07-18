@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>School management</title>
+<link rel="stylesheet"
+type="text/css"
+th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+<h1>choose minimal group size</h1>
+</body>
+<form method="POST" th:action="@{/1}">
+		<input type="text" th:name="size" placeholder="Enter size" value="enter size"  />
+		 <input type="submit" value="Add" />
+	</form>
+</html>

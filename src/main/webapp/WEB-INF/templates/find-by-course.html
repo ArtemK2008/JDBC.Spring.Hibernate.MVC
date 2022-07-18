@@ -1,0 +1,17 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>choose a course</title>
+<link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+	<h1>choose a course to see its students</h1>
+	<form action = "#" method="POST" th:action="@{/2}" th:object = "${courseList}">
+		<select name = "course" th:object="${courseList}">
+			<option th:each="course : ${courseList}" th:value="${course}" th:name = "${course}"
+				th:text="${course}"></option>
+		</select>
+		 <input type="submit" value="find students" />
+		</form>
+</body>
+</html>

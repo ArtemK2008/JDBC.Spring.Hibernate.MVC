@@ -1,0 +1,20 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>group size filter</title>
+<link rel="stylesheet"
+type="text/css"
+th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+<h1>groups with size more then <span th:text ="${size}">size</span></h1>
+<div th:if="${groups.size != null}">
+    <h1>Result</h1>
+    <ul>
+    <th:block th:object="${groups}">
+       <li th:each="group : ${groups}" th:text="${group}">group description here...</li>
+    </th:block>
+    </ul>
+</div>
+</body>
+</html>

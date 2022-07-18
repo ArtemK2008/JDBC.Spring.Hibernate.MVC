@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>delete student</title>
+<link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+	<h1>choose id of a student you want to delete</h1>
+	
+	<form method="POST" th:action="@{/4}" th:object="${student}">
+		<table>
+			<tr>
+				<td>id</td>
+				<td><input type="text" th:name="id"
+					th:field="*{id}" value="Enter id to delete" /></td>
+				<td th:if="${#fields.hasErrors('id')}"
+					th:errors="*{id}">id Error</td>
+			</tr>
+			<tr>
+				<td><button type="submit">Submit</button></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>remove course</title>
+<link rel="stylesheet"
+type="text/css"
+th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+<h1>Choose ID of a student you want to modify</h1>
+<form method="POST" th:action="@{/6}">
+		<input type="text" th:name="studentId" placeholder="Enter ID" />
+		 <input type="submit" value="choose" />
+	</form>
+</body>
+</html>

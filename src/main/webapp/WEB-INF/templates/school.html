@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>School management</title>
+<link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+	<h1>School management</h1>
+
+	<p>
+		<button type="button">
+			<a th:href="@{/1}">Find all groups with less or equals student
+				count</a>
+		</button>
+	</p>
+
+	<p>
+		<button type="button">
+			<a th:href="@{/2}">Find all students related to course with given
+				name</a>
+		</button>
+	</p>
+
+	<p>
+		<button type="button">
+			<a th:href="@{/3}">Add new student</a>
+		</button>
+	</p>
+
+	<p>
+		<button type="button">
+			<a th:href="@{/4}">Delete student by ID</a>
+		</button>
+	</p>
+
+	<p>
+		<button type="button">
+			<a th:href="@{/5}">Add a student to the course (from a list)</a>
+		</button>
+	</p>
+	
+	<p>
+		<button type="button">
+			<a th:href="@{/6}">Remove the student from one of his or her
+				courses</a>
+		</button>
+	</p>
+
+</body>
+</html>
