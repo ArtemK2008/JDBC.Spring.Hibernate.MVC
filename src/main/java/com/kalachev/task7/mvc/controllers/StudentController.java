@@ -15,6 +15,7 @@ import com.kalachev.task7.dao.entities.Student;
 import com.kalachev.task7.service.CoursesOptions;
 import com.kalachev.task7.service.GroupOptions;
 import com.kalachev.task7.service.StudentOptions;
+import com.kalachev.task7.utilities.ControllerUtills;
 
 @Controller
 @RequestMapping("/")
@@ -40,11 +41,23 @@ public class StudentController {
   }
 
   @PostMapping("/1")
-  public String cmd1Post(@RequestParam("size") int size, Model model) {
-    List<String> groupsFiltered = gOptions.findBySize(size);
-    model.addAttribute("groups", groupsFiltered);
-    model.addAttribute("size", size);
-    return "size-handling-page";
+  public String cmd1Post(@RequestParam("size") String size, Model model) {
+    String result = ControllerUtills.validateSize(size);
+    if (result.equals("valid")) {
+      int validSize = Integer.parseInt(size);
+      List<String> groups = gOptions.findBySize(validSize);
+      if (groups.isEmpty()) {
+        result = "no groups found";
+        model.addAttribute("result", result);
+        return "bad";
+      }
+      model.addAttribute("groups", groups);
+      model.addAttribute("size", size);
+      return "size-handling-page";
+    } else {
+      model.addAttribute("result", result);
+      return "bad";
+    }
   }
 
   @GetMapping(value = "/2")
