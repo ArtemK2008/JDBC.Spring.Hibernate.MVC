@@ -21,6 +21,12 @@ import com.kalachev.task7.utilities.ControllerUtills;
 @RequestMapping("/")
 public class StudentController {
 
+  static final String GO_TO_ERROR_PAGE = "redirect:/bad";
+  static final String ERROR_PAGE = "bad";
+  static final String GO_TO_SUCCESS_PAGE = "redirect:/good";
+  static final String SUCCESS_PAGE = "good";
+  static final String RESULT = "result";
+  static final String VALID = "valid";
   @Autowired
   CoursesOptions cOptions;
 
@@ -36,32 +42,33 @@ public class StudentController {
   }
 
   @GetMapping(value = "/1")
-  public String cmd1() {
+  public String groupCommand() {
     return "group-size";
   }
 
   @PostMapping("/1")
-  public String cmd1Post(@RequestParam("size") String size, Model model) {
+  public String handleGroupCommand(@RequestParam("size") String size,
+      Model model) {
     String result = ControllerUtills.validateSize(size);
-    if (result.equals("valid")) {
+    if (result.equals(VALID)) {
       int validSize = Integer.parseInt(size);
       List<String> groups = gOptions.findBySize(validSize);
       if (groups.isEmpty()) {
         result = "no groups found";
-        model.addAttribute("result", result);
-        return "bad";
+        model.addAttribute(RESULT, result);
+        return ERROR_PAGE;
       }
       model.addAttribute("groups", groups);
       model.addAttribute("size", size);
       return "size-handling-page";
     } else {
-      model.addAttribute("result", result);
-      return "bad";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
     }
   }
 
   @GetMapping(value = "/2")
-  public String cmd2(Model model) {
+  public String findStudents(Model model) {
     List<String> courses = cOptions.findCourseNames();
     if (courses.isEmpty()) {
       model.addAttribute("empty", "no course found");
@@ -71,21 +78,15 @@ public class StudentController {
   }
 
   @PostMapping(value = "/2")
-  public String cmd2Post(@RequestParam("course") String course,
-      RedirectAttributes redirectAttributes) {
+  public String handleFindStudents(@RequestParam("course") String course,
+      Model model) {
     List<String> courseStudents = sOptions.findByCourse(course);
     if (courseStudents.isEmpty()) {
-      redirectAttributes.addFlashAttribute("result",
-          "no students in this course");
-      return "redirect:/bad";
+      model.addAttribute(RESULT, "no students in this course");
+      return ERROR_PAGE;
     }
-    redirectAttributes.addFlashAttribute("students", courseStudents);
-    redirectAttributes.addFlashAttribute("course", course);
-    return "redirect:/next2";
-  }
-
-  @GetMapping("/next2")
-  public String cmd2n(Model model) {
+    model.addAttribute("students", courseStudents);
+    model.addAttribute("course", course);
     return "find-by-course-student-list";
   }
 
@@ -96,90 +97,131 @@ public class StudentController {
 
   @PostMapping("/3")
   public String handleAddStudent(@RequestParam("firstName") String firstName,
-
       @RequestParam("lastName") String lastName,
+      @RequestParam("groupId") String groupId, Model model) {
 
-      @RequestParam("groupId") int groupId) {
-
-    if (sOptions.addNewStudent(firstName, lastName, groupId)) {
-      return "redirect:/good";
+    String result = ControllerUtills.validateGroupId(groupId);
+    if (result.equals(VALID)) {
+      int id = Integer.parseInt(groupId);
+      if (sOptions.checkIfStudentAlreadyInGroup(id, firstName, lastName)) {
+        result = "User Already exists";
+        model.addAttribute(RESULT, result);
+        return ERROR_PAGE;
+      }
+      sOptions.addNewStudent(firstName, lastName, id);
+      return GO_TO_SUCCESS_PAGE;
     }
-    return "redirect:/bad";
+    model.addAttribute(RESULT, result);
+    return ERROR_PAGE;
   }
 
-  /*
-   * @PostMapping("/3") public String handleAddStudent(@Valid Student student,
-   * BindingResult bindingResult) {
-   * 
-   * if (bindingResult.hasErrors()) { return "add-student"; }
-   * 
-   * if (sOptions.addNewStudent(student.getFirstName(), student.getLastName(),
-   * student.getGroupId())) { return "redirect:/good"; } return "redirect:/bad";
-   * }
-   */
-
   @GetMapping(value = "/4")
-  public String cmd4(Student student) {
+  public String deleteStudent(Student student) {
     return "delete-student";
   }
 
   @PostMapping("/4")
-  public String cmd4(@RequestParam("id") int id) {
-    if (sOptions.deleteStudentById(id)) {
-      return "redirect:/good";
+  public String handleDeleteStudent(@RequestParam("id") String id,
+      Model model) {
+    String result = ControllerUtills.validateStudentId(id);
+    if (result.equals(VALID)) {
+      int studentId = Integer.parseInt(id);
+      if (!sOptions.checkIfStudentIdExists(studentId)) {
+        result = "no such student";
+        model.addAttribute(RESULT, result);
+        return ERROR_PAGE;
+      }
+      sOptions.deleteStudentById(studentId);
+      return GO_TO_SUCCESS_PAGE;
     }
-    return "redirect:/bad";
+    model.addAttribute(RESULT, result);
+    return ERROR_PAGE;
   }
 
   @GetMapping(value = "/5")
-  public String addToCoursePage() {
+  public String addToCourse(Model model) {
+    List<String> courses = cOptions.findCourseNames();
+    if (courses.isEmpty()) {
+      model.addAttribute("empty", "no course found");
+    }
+    model.addAttribute("courseList", courses);
     return "add-to-course";
   }
 
   @PostMapping("/5")
-  public String addToCour1sePost(@RequestParam("studentId") int studentId,
-      @RequestParam("course") String course) {
+  public String handleAddToCourse(@RequestParam("studentId") String studentId,
+      @RequestParam("course") String course, Model model) {
 
-    boolean isAdded = cOptions.addStudentToCourse(studentId, course);
-    if (isAdded) {
-      return "redirect:/good";
+    String result = ControllerUtills.validateStudentId(studentId);
+    if (result.equals(VALID)) {
+      int id = Integer.parseInt(studentId);
+      if (!cOptions.checkIfStudentIdExists(id)) {
+        result = "There is no student with such id";
+        model.addAttribute(RESULT, result);
+        return ERROR_PAGE;
+      }
+      if (cOptions.checkIfStudentAlreadyInCourse(id, course)) {
+        result = "student already in course";
+        model.addAttribute(RESULT, result);
+        return ERROR_PAGE;
+      }
+      cOptions.addStudentToCourse(id, course);
+      return GO_TO_SUCCESS_PAGE;
     }
-    return "redirect:/bad";
+    model.addAttribute(RESULT, result);
+    return ERROR_PAGE;
   }
 
   @GetMapping(value = "/6")
-  public String cmd6(Model model) {
+  public String removeFromCourse(Model model) {
     return "remove-from-course";
   }
 
   @PostMapping(value = "/6")
-  public String cmd6Post(@RequestParam("studentId") int studentId,
-      RedirectAttributes redirectAttributes) {
-    List<String> coursesOfAStudent = cOptions.findCourseNamesByID(studentId);
+  public String handleRemoveFromCourse(
+      @RequestParam("studentId") String studentId,
+      RedirectAttributes redirectAttributes, Model model) {
+
+    String result = ControllerUtills.validateStudentId(studentId);
+    if (!result.equals(VALID)) {
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    int id = Integer.parseInt(studentId);
+    if (!cOptions.checkIfStudentIdExists(id)) {
+      result = "There is no student with such id";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    List<String> coursesOfAStudent = cOptions.findCourseNamesByID(id);
+    if (coursesOfAStudent.isEmpty()) {
+      model.addAttribute(RESULT,
+          "Student with id " + studentId + " is not enrolled in any course");
+    }
+
     redirectAttributes.addFlashAttribute("courses", coursesOfAStudent);
     redirectAttributes.addFlashAttribute("id", studentId);
-    return "redirect:/next6";
+    return "redirect:/complete-removing";
   }
 
-  @GetMapping("/next6")
+  @GetMapping("/complete-removing")
   public String cmd6g() {
     return "remove-from-course-choose-course";
   }
 
-  @PostMapping("/next6")
+  @PostMapping("/complete-removing")
   public String cmd6n(@RequestParam("course") String course,
       @RequestParam("id") Integer id) {
-    System.out.println(id);
     boolean isRemoved = cOptions.removeStudentFromCourse(id, course);
     if (isRemoved) {
-      return "redirect:/good";
+      return GO_TO_SUCCESS_PAGE;
     }
-    return "redirect:/bad";
+    return GO_TO_ERROR_PAGE;
   }
 
   @GetMapping("bad")
   public String badResult() {
-    return "bad";
+    return ERROR_PAGE;
   }
 
   @GetMapping("good")

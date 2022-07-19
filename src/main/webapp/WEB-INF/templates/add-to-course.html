@@ -5,22 +5,24 @@
 <link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
 </head>
 <body>
-	<form method="POST" th:action="@{/5}">
-		<input type="text" th:name="studentId" placeholder="Enter ID"   />
-		 <select
-			th:name="course">
-			<option value="English">English</option>
-			<option value="Mandarin">Mandarin</option>
-			<option value="Hindi">Hindi</option>
-			<option value="Spanish">Spanish</option>
-			<option value="French">French</option>
-			<option value="Arabic">Arabic</option>
-			<option value="Bengali">Bengali</option>
-			<option value="Russian">Russian</option>
-			<option value="Portuguese">Portuguese</option>
-			<option value="Ukrainian">Ukrainian</option>
-		</select> <input type="submit" value="Add" />
-		
-	</form>
+<div th:if="${empty != null}">
+		<h1>
+			<span th:text="${empty}"></span>
+		</h1>
+	</div>
+	
+	<div th:if="${empty == null}">
+		<h1>enter student and course you want him to be added</h1>
+
+		<form action="#" method="POST" th:action="@{/5}"
+			th:object="${courseList}">
+			<input type="text" th:name="studentId" placeholder="Enter ID"   />
+			<select name="course" th:object="${courseList}">
+				<option th:each="course : ${courseList}" th:value="${course}"
+					th:name="${course}" th:text="${course}"></option>
+			</select> <input type="submit" value="Add" />
+		</form>
+	</div>
+	
 </body>
 </html>

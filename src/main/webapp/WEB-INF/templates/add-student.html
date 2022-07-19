@@ -23,7 +23,7 @@
 			</tr>
 			<tr>
 				<td>group id</td>
-				<td><input type="number" th:name="groupId" th:field="*{groupId}"
+				<td><input type="text" th:name="groupId" th:field="*{groupId}"
 					value="Enter ID" /></td>
 				<td th:if="${#fields.hasErrors('groupId')}" th:errors="*{groupId}">group
 					error</td>

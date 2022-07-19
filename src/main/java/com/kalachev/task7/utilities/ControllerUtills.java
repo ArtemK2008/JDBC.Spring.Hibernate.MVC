@@ -19,4 +19,28 @@ public class ControllerUtills {
     return result;
   }
 
+  public static String validateGroupId(String groupId) {
+    String result = "valid";
+    if (!NumberUtils.isParsable(groupId)) {
+      return "group id is not an int";
+    }
+    int id = Integer.parseInt(groupId);
+    if (id < 1 || id > 11) {
+      result = "Wrong groupd id";
+    }
+    return result;
+  }
+
+  public static String validateStudentId(String studentId) {
+    String result = "valid";
+    if (!NumberUtils.isParsable(studentId)) {
+      return "id is not an int";
+    }
+    int id = Integer.parseInt(studentId);
+    if (id < 1) {
+      result = "Wrong student id";
+    }
+    return result;
+  }
+
 }
