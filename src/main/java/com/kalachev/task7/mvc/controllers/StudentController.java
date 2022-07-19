@@ -2,12 +2,9 @@ package com.kalachev.task7.mvc.controllers;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,40 +75,37 @@ public class StudentController {
   }
 
   @PostMapping("/3")
-  public String handleAddStudent(@Valid Student student,
-      BindingResult bindingResult) {
+  public String handleAddStudent(@RequestParam("firstName") String firstName,
 
-    if (bindingResult.hasErrors()) {
-      return "add-student";
-    }
+      @RequestParam("lastName") String lastName,
 
-    if (sOptions.addNewStudent(student.getFirstName(), student.getLastName(),
-        student.getGroupId())) {
+      @RequestParam("groupId") int groupId) {
+
+    if (sOptions.addNewStudent(firstName, lastName, groupId)) {
       return "redirect:/good";
     }
     return "redirect:/bad";
   }
 
+  /*
+   * @PostMapping("/3") public String handleAddStudent(@Valid Student student,
+   * BindingResult bindingResult) {
+   * 
+   * if (bindingResult.hasErrors()) { return "add-student"; }
+   * 
+   * if (sOptions.addNewStudent(student.getFirstName(), student.getLastName(),
+   * student.getGroupId())) { return "redirect:/good"; } return "redirect:/bad";
+   * }
+   */
+
   @GetMapping(value = "/4")
-  public String deleteStudent(Student student) {
+  public String cmd4(Student student) {
     return "delete-student";
   }
 
-  /*
-   * @PostMapping("/4") public String handleDeleteStudent(@RequestParam("id")
-   * int id) { if (sOptions.deleteStudentById(id)) { return "redirect:/good"; }
-   * return "redirect:/bad"; }
-   */
-
   @PostMapping("/4")
-  public String handleDeleteStudent(@Valid Student student,
-      BindingResult bindingResult) {
-
-    /*
-     * if (bindingResult.hasErrors()) { return "delete-student"; }
-     */
-
-    if (sOptions.deleteStudentById(student.getId())) {
+  public String cmd4(@RequestParam("id") int id) {
+    if (sOptions.deleteStudentById(id)) {
       return "redirect:/good";
     }
     return "redirect:/bad";
