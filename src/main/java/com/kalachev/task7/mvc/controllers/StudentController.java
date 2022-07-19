@@ -63,6 +63,9 @@ public class StudentController {
   @GetMapping(value = "/2")
   public String cmd2(Model model) {
     List<String> courses = cOptions.findCourseNames();
+    if (courses.isEmpty()) {
+      model.addAttribute("empty", "no course found");
+    }
     model.addAttribute("courseList", courses);
     return "find-by-course";
   }
@@ -71,7 +74,11 @@ public class StudentController {
   public String cmd2Post(@RequestParam("course") String course,
       RedirectAttributes redirectAttributes) {
     List<String> courseStudents = sOptions.findByCourse(course);
-
+    if (courseStudents.isEmpty()) {
+      redirectAttributes.addFlashAttribute("result",
+          "no students in this course");
+      return "redirect:/bad";
+    }
     redirectAttributes.addFlashAttribute("students", courseStudents);
     redirectAttributes.addFlashAttribute("course", course);
     return "redirect:/next2";
