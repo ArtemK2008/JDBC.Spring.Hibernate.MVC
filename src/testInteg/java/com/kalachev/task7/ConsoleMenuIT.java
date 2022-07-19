@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
 import java.io.ByteArrayOutputStream;
@@ -25,12 +26,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.menu.ConsoleMenu;
 import com.kalachev.task7.utilities.ConnectionManager;
@@ -45,6 +49,8 @@ class ConsoleMenuIT {
   Scanner mockScanner;
   @SpyBean
   Initializer spyInitializer;
+  @Autowired
+  ApplicationEventPublisher publisher;
   private final PrintStream standardOut = System.out;
   ByteArrayOutputStream outputStreamCaptor;
   final static String NEWLINE = System.lineSeparator();
@@ -204,7 +210,6 @@ class ConsoleMenuIT {
     // given
     String expectedMessage = "Student " + FIRSTNAME + " " + LASTNAME
         + " added to group " + GROUP_ID;
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(GROUP_ID).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -215,7 +220,7 @@ class ConsoleMenuIT {
     });
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
-    String actualMessage = outputLines[22];
+    String actualMessage = outputLines[11];
     int countAfter = countStudentsInDatabase();
     // then
     assertEquals(200, countBefore);
@@ -229,7 +234,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsNotInt()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(NOT_AN_INTEGER).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -244,7 +249,7 @@ class ConsoleMenuIT {
     // then
     assertEquals(200, countBefore);
     assertEquals(0, statusCode);
-    assertEquals(BAD_INPUT, outputLines[22]);
+    assertEquals(BAD_INPUT, outputLines[11]);
     assertEquals(200, countAfter);
   }
 
@@ -252,7 +257,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsOutOfRange()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(HUGE_INT).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -267,7 +272,7 @@ class ConsoleMenuIT {
     // then
     assertEquals(200, countBefore);
     assertEquals(0, statusCode);
-    assertEquals("Wrong groupd id", outputLines[22]);
+    assertEquals("Wrong groupd id", outputLines[11]);
     assertEquals(200, countAfter);
   }
 
@@ -275,9 +280,9 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldDeleteStudentFromDatabase_whenUserAsksToDelete()
       throws Exception {
     // given
+    publisher.publishEvent(new initializationEvent(this));
     String expectedMessage = "student with id " + STUDENT_TO_DELETE_ID
         + " deleted";
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("4")
         .thenReturn(STUDENT_TO_DELETE_ID).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -288,7 +293,7 @@ class ConsoleMenuIT {
     });
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
-    String actualMessage = outputLines[20];
+    String actualMessage = outputLines[9];
     int countAfter = countStudentsInDatabase();
     // then
     assertEquals(200, countBefore);
@@ -302,7 +307,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdIsNotInt()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NOT_AN_INTEGER)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -317,7 +322,7 @@ class ConsoleMenuIT {
     // then
     assertEquals(200, countBefore);
     assertEquals(0, statusCode);
-    assertEquals(BAD_INPUT, outputLines[20]);
+    assertEquals(BAD_INPUT, outputLines[9]);
     assertEquals(200, countAfter);
   }
 
@@ -325,7 +330,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotExists()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(HUGE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -340,7 +345,7 @@ class ConsoleMenuIT {
     // then
     assertEquals(200, countBefore);
     assertEquals(0, statusCode);
-    assertEquals("no such student", outputLines[20]);
+    assertEquals("no such student", outputLines[9]);
     assertEquals(200, countAfter);
   }
 
@@ -348,7 +353,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenNegaiveId()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NEGAGTIVE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -363,7 +368,7 @@ class ConsoleMenuIT {
     // then
     assertEquals(200, countBefore);
     assertEquals(0, statusCode);
-    assertEquals("Wrong student id", outputLines[20]);
+    assertEquals("Wrong student id", outputLines[9]);
     assertEquals(200, countAfter);
   }
 
@@ -373,11 +378,10 @@ class ConsoleMenuIT {
     // given
     String expectedMessage = "Student with id " + STUDENT_ID
         + " added to course " + COURSE;
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
-    doNothing().when(spyInitializer).initializeTables();
+    doNothing().when(spyInitializer).initializeTablesEvent(any());
     // when
     int coursesNumberBefore = countStudentCourses(STUDENT_ID);
     int statusCode = catchSystemExit(() -> {
@@ -385,7 +389,7 @@ class ConsoleMenuIT {
     });
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
-    String actualMessage = outputLines[31];
+    String actualMessage = outputLines[20];
     // then
     assertNotEquals(0, coursesNumberBefore);
     assertTrue(coursesNumberBefore < 4);
@@ -405,11 +409,11 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenCourseNameWasWrong()
       throws Exception {
     // given
-    createData();
+    publisher.publishEvent(new initializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(COURSE + "is worng").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
-    doNothing().when(spyInitializer).initializeTables();
+    doNothing().when(spyInitializer).initializeTablesEvent(any());
     // when
     int coursesNumberBefore = countStudentCourses(STUDENT_ID);
     int statusCode = catchSystemExit(() -> {
@@ -422,14 +426,13 @@ class ConsoleMenuIT {
     assertNotEquals(0, coursesNumberBefore);
     assertTrue(coursesNumberBefore < 4);
     assertEquals(0, statusCode);
-    assertEquals("Wrong course name", outputLines[31]);
+    assertEquals("Wrong course name", outputLines[20]);
     assertEquals(coursesNumberAfter, coursesNumberBefore);
   }
 
   @Test
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotInt() throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(NOT_AN_INTEGER)
         .thenReturn(COURSE + "is worng").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -441,14 +444,13 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals(BAD_INPUT, outputLines[20]);
+    assertEquals(BAD_INPUT, outputLines[9]);
   }
 
   @Test
   void testConsoleMenu_shouldPrintErrorMessage_whenIdIsNegative()
       throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(NEGAGTIVE_INT)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -460,14 +462,13 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals("id cant be negative", outputLines[20]);
+    assertEquals("id cant be negative", outputLines[9]);
   }
 
   @Test
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotExist()
       throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(HUGE_INT)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -479,19 +480,18 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals("There is no student with such id", outputLines[20]);
+    assertEquals("There is no student with such id", outputLines[9]);
   }
 
   @Test
   void testConsoleMenu_shouldPrintErrorMessage_whenIdAlreadyInCourse()
       throws Exception {
     // given
-    createData();
     String existingCourse = findStudentCourse(STUDENT_ID);
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(existingCourse).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
-    doNothing().when(spyInitializer).initializeTables();
+    doNothing().when(spyInitializer).initializeTablesEvent(any());
     // when
     int coursesNumberBefore = countStudentCourses(STUDENT_ID);
     int statusCode = catchSystemExit(() -> {
@@ -504,7 +504,7 @@ class ConsoleMenuIT {
     assertNotEquals(0, coursesNumberBefore);
     assertTrue(coursesNumberBefore < 4);
     assertEquals(0, statusCode);
-    assertEquals("student already in course", outputLines[31]);
+    assertEquals("student already in course", outputLines[20]);
     assertEquals(coursesNumberAfter, coursesNumberBefore);
   }
 
@@ -512,14 +512,13 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldRemoveStudentFromCourse_whenUserAsksToDelete()
       throws Exception {
     // given
-    createData();
     String course = findStudentCourse(STUDENT_ID);
     String expectedMessage = "Student with id " + STUDENT_ID + " removed from "
         + course;
     Mockito.when(mockScanner.next()).thenReturn("6").thenReturn(STUDENT_ID)
         .thenReturn(course).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
-    doNothing().when(spyInitializer).initializeTables();
+    doNothing().when(spyInitializer).initializeTablesEvent(any());
     // when
     int coursesNumberBefore = countStudentCourses(STUDENT_ID);
     int statusCode = catchSystemExit(() -> {
@@ -527,7 +526,7 @@ class ConsoleMenuIT {
     });
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
-    String actualMessage = outputLines[21 + coursesNumberBefore];
+    String actualMessage = outputLines[10 + coursesNumberBefore];
     int coursesNumberAfter = countStudentCourses(STUDENT_ID);
     // then
     assertNotEquals(0, coursesNumberBefore);
@@ -542,11 +541,10 @@ class ConsoleMenuIT {
       throws Exception {
     // given
     String expectedMessage = "Wrong course name";
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("6").thenReturn(STUDENT_ID)
         .thenReturn(COURSE + "is wrong").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
-    doNothing().when(spyInitializer).initializeTables();
+    doNothing().when(spyInitializer).initializeTablesEvent(any());
     // when
     int coursesNumberBefore = countStudentCourses(STUDENT_ID);
     int statusCode = catchSystemExit(() -> {
@@ -554,7 +552,7 @@ class ConsoleMenuIT {
     });
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
-    String actualMessage = outputLines[21 + coursesNumberBefore];
+    String actualMessage = outputLines[10 + coursesNumberBefore];
     int coursesNumberAfter = countStudentCourses(STUDENT_ID);
     // then
     assertNotEquals(0, coursesNumberBefore);
@@ -568,7 +566,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintDeleteErrorMessage_whenIdNotInt()
       throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("6").thenReturn(NOT_AN_INTEGER)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -580,14 +577,13 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals(BAD_INPUT, outputLines[20]);
+    assertEquals(BAD_INPUT, outputLines[9]);
   }
 
   @Test
   void testConsoleMenu_shouldPrintDeleteErrorMessage_whenIdIsNegative()
       throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("6").thenReturn(NEGAGTIVE_INT)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -599,14 +595,13 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals("Wrong id", outputLines[20]);
+    assertEquals("Wrong id", outputLines[9]);
   }
 
   @Test
   void testConsoleMenu_shouldPrintDeleteErrorMessage_whenIdNotExist()
       throws Exception {
     // given
-    createData();
     Mockito.when(mockScanner.next()).thenReturn("6").thenReturn(HUGE_INT)
         .thenReturn(COURSE).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -618,7 +613,7 @@ class ConsoleMenuIT {
     String[] outputLines = output.split(NEWLINE);
     // then
     assertEquals(0, statusCode);
-    assertEquals("There is no student with such id", outputLines[20]);
+    assertEquals("There is no student with such id", outputLines[9]);
   }
 
   @Test
@@ -695,13 +690,6 @@ class ConsoleMenuIT {
       JdbcUtil.closeAll(rs, statement, connection);
     }
     return groups;
-  }
-
-  private void createData() throws Exception {
-    Mockito.when(mockScanner.next()).thenReturn(EXIT);
-    catchSystemExit(() -> {
-      spyMenu.runSchoolApp();
-    });
   }
 
   private int countStudentsInDatabase() {

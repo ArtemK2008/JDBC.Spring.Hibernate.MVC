@@ -7,13 +7,17 @@ import java.util.Scanner;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.commands.Command;
 
 @Component
 public class ConsoleMenu {
+  @Autowired
+  private ApplicationEventPublisher publisher;
   static final String BAD_INPUT = "Your Input was not correct";
   Scanner scanner;
   @Autowired
@@ -39,8 +43,8 @@ public class ConsoleMenu {
       "6: Remove the student from one of his or her courses", "7: Exit" };
 
   public void runSchoolApp() {
-    initializerImpl.initializeTables();
     cleanConsole();
+    publisher.publishEvent(new initializationEvent(this));
     String option = "1";
     while (!"7".equals(option)) {
       printMenu(options);

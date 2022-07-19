@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 
 import com.kalachev.task7.initialization.CoursesInitializer;
 import com.kalachev.task7.initialization.GroupInitializer;
-import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.initialization.SchemaInitializer;
 import com.kalachev.task7.initialization.StudentInitializer;
 import com.kalachev.task7.initialization.impl.CoursesInitializerImpl;
@@ -41,12 +40,13 @@ class RemoveFromCourseCommandTest {
   static GroupInitializer groupInitializer = new GroupInitializerImpl();
   static CoursesInitializer coursesInitializer = new CoursesInitializerImpl();
   static SchemaInitializer schemaInitializer = new SchemaInitializerImpl();
-  static Initializer intInitializer = new InitializerImpl(studentInitializer,
-      coursesInitializer, groupInitializer, schemaInitializer);
+  static InitializerImpl initializer = new InitializerImpl(
+      studentInitializer, coursesInitializer, groupInitializer,
+      schemaInitializer);
 
   @BeforeAll
   static void startUp() {
-    intInitializer.initializeTables();
+    initializer.initializeTables();
   }
 
   @BeforeEach
