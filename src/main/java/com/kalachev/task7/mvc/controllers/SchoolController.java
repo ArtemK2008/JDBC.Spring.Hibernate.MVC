@@ -19,7 +19,7 @@ import com.kalachev.task7.utilities.ControllerUtills;
 
 @Controller
 @RequestMapping("/")
-public class StudentController {
+public class SchoolController {
 
   static final String GO_TO_ERROR_PAGE = "redirect:/bad";
   static final String ERROR_PAGE = "bad";
@@ -50,21 +50,20 @@ public class StudentController {
   public String handleGroupCommand(@RequestParam("size") String size,
       Model model) {
     String result = ControllerUtills.validateSize(size);
-    if (result.equals(VALID)) {
-      int validSize = Integer.parseInt(size);
-      List<String> groups = gOptions.findBySize(validSize);
-      if (groups.isEmpty()) {
-        result = "no groups found";
-        model.addAttribute(RESULT, result);
-        return ERROR_PAGE;
-      }
-      model.addAttribute("groups", groups);
-      model.addAttribute("size", size);
-      return "size-handling-page";
-    } else {
+    if (!result.equals(VALID)) {
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
+    int validSize = Integer.parseInt(size);
+    List<String> groups = gOptions.findBySize(validSize);
+    if (groups.isEmpty()) {
+      result = "no groups found";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    model.addAttribute("groups", groups);
+    model.addAttribute("size", size);
+    return "size-handling-page";
   }
 
   @GetMapping(value = "/2")

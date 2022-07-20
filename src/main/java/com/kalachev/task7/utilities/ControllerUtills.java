@@ -4,12 +4,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 public class ControllerUtills {
 
+  static final String VALID = "valid";
+
   private ControllerUtills() {
     super();
   }
 
   public static String validateSize(String size) {
-    String result = "valid";
+    String result = VALID;
     if (!NumberUtils.isParsable(size)) {
       return " not an int";
     }
@@ -20,7 +22,7 @@ public class ControllerUtills {
   }
 
   public static String validateGroupId(String groupId) {
-    String result = "valid";
+    String result = VALID;
     if (!NumberUtils.isParsable(groupId)) {
       return "group id is not an int";
     }
@@ -32,7 +34,7 @@ public class ControllerUtills {
   }
 
   public static String validateStudentId(String studentId) {
-    String result = "valid";
+    String result = VALID;
     if (!NumberUtils.isParsable(studentId)) {
       return "id is not an int";
     }
