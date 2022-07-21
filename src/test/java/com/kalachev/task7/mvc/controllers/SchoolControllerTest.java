@@ -1,15 +1,18 @@
 package com.kalachev.task7.mvc.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +26,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.service.CoursesOptions;
 import com.kalachev.task7.service.GroupOptions;
+import com.kalachev.task7.service.StudentOptions;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
@@ -36,7 +41,14 @@ class SchoolControllerTest {
   SchoolController controller;
 
   @MockBean
-  GroupOptions mockOptions;
+  GroupOptions mockGroupOptions;
+
+  @MockBean
+  CoursesOptions mockCourseOptions;
+
+  @MockBean
+  StudentOptions mockStudentOptions;
+
   MockMvc mockMvc;
 
   @BeforeEach
@@ -69,20 +81,20 @@ class SchoolControllerTest {
   }
 
   @Test
-  void testGroupPagePost_shouldReturnStudentNames_whenRequestIsValid()
+  void testGroupPagePost_shouldReturnGroupsNames_whenRequestIsValid()
       throws Exception {
     // given
     String url = ("/1");
     List<String> expected = new ArrayList<>();
-    expected.add("Student A");
+    expected.add("Group A");
     String size = "20";
     int iSize = Integer.parseInt(size);
-    when(mockOptions.findBySize(iSize)).thenReturn(expected);
+    when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
     // when
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name("size-handling-page"));
     // then
-    verify(mockOptions, times(1)).findBySize(iSize);
+    verify(mockGroupOptions, times(1)).findBySize(iSize);
   }
 
   @Test
@@ -95,7 +107,7 @@ class SchoolControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
     // then
-    verifyNoInteractions(mockOptions);
+    verifyNoInteractions(mockGroupOptions);
   }
 
   @Test
@@ -108,7 +120,7 @@ class SchoolControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
     // then
-    verifyNoInteractions(mockOptions);
+    verifyNoInteractions(mockGroupOptions);
   }
 
   @Test
@@ -119,11 +131,77 @@ class SchoolControllerTest {
     List<String> expected = new ArrayList<>();
     String size = "20";
     int iSize = Integer.parseInt(size);
-    when(mockOptions.findBySize(iSize)).thenReturn(expected);
+    when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
     // when
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
     // then
-    verify(mockOptions, times(1)).findBySize(iSize);
+    verify(mockGroupOptions, times(1)).findBySize(iSize);
+  }
+
+  @Test
+  void testFindStudentsPageGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/2");
+    List<String> courses = Arrays.asList("testCourse");
+    when(mockCourseOptions.findCourseNames()).thenReturn(courses);
+
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("find-by-course"))
+        .andExpect(model().attributeExists("courseList"))
+        .andExpect(model().attributeDoesNotExist("empty")).andExpect(
+            model().attribute("courseList", hasItems(courses.toArray())));
+    // then
+    verify(mockCourseOptions, times(1)).findCourseNames();
+  }
+
+  @Test
+  void testFindStudentsPageGet_shouldReturnEmptyAttribute_whenNoCoursesExist()
+      throws Exception {
+    // given
+    String url = ("/2");
+    List<String> courses = new ArrayList<>();
+    when(mockCourseOptions.findCourseNames()).thenReturn(courses);
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("find-by-course"))
+        .andExpect(model().attributeExists("empty"))
+        .andExpect(model().attributeExists("courseList"));
+    // then
+    verify(mockCourseOptions, times(1)).findCourseNames();
+  }
+
+  @Test
+  void testFindStudentsPagePost_shouldReturnStudentNames_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/2");
+    List<String> expected = Arrays.asList("Student A");
+    String course = "Test Course";
+    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
+        .andExpect(view().name("find-by-course-student-list"))
+        .andExpect(model().attributeExists("students"))
+        .andExpect(model().attributeExists("course"))
+        .andExpect(model().attribute("students", hasItems(expected.toArray())));
+    // then
+    verify(mockStudentOptions, times(1)).findByCourse(course);
+  }
+
+  @Test
+  void testFindStudentsPagePost_shouldReturnErrorPage_whenCourseHasNoStudents()
+      throws Exception {
+    // given
+    String url = ("/2");
+    List<String> expected = new ArrayList<>();
+    String course = "Test Course";
+    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
+        .andExpect(view().name(ERROR_PAGE))
+        .andExpect(model().attributeExists("result"));
+    // then
+    verify(mockStudentOptions, times(1)).findByCourse(course);
   }
 }
