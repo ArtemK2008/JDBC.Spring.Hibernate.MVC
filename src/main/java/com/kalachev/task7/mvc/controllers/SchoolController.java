@@ -100,18 +100,18 @@ public class SchoolController {
       @RequestParam("groupId") String groupId, Model model) {
 
     String result = ControllerUtills.validateGroupId(groupId);
-    if (result.equals(VALID)) {
-      int id = Integer.parseInt(groupId);
-      if (sOptions.checkIfStudentAlreadyInGroup(id, firstName, lastName)) {
-        result = "User Already exists";
-        model.addAttribute(RESULT, result);
-        return ERROR_PAGE;
-      }
-      sOptions.addNewStudent(firstName, lastName, id);
-      return GO_TO_SUCCESS_PAGE;
+    if (!result.equals(VALID)) {
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
     }
-    model.addAttribute(RESULT, result);
-    return ERROR_PAGE;
+    int id = Integer.parseInt(groupId);
+    if (sOptions.checkIfStudentAlreadyInGroup(id, firstName, lastName)) {
+      result = "User Already exists";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    sOptions.addNewStudent(firstName, lastName, id);
+    return GO_TO_SUCCESS_PAGE;
   }
 
   @GetMapping(value = "/4")

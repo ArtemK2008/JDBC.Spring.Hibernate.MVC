@@ -204,4 +204,145 @@ class SchoolControllerTest {
     // then
     verify(mockStudentOptions, times(1)).findByCourse(course);
   }
+
+  @Test
+  void testAddStudentPageGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/3");
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("add-student"));
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnSuccesfullPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "1";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(false);
+    when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
+        .thenReturn(true);
+    // when
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name("redirect:/good"));
+    // then
+    verify(mockStudentOptions, times(1))
+        .checkIfStudentAlreadyInGroup(convertedId, firstName, lastName);
+    verify(mockStudentOptions, times(1)).addNewStudent(firstName, lastName,
+        convertedId);
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnErrorPage_whenStudentExists()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "1";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(true);
+    when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
+        .thenReturn(true);
+    // when
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verify(mockStudentOptions, times(1))
+        .checkIfStudentAlreadyInGroup(convertedId, firstName, lastName);
+    verify(mockStudentOptions, times(0)).addNewStudent(firstName, lastName,
+        convertedId);
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnErrorPage_whenIdIsNegative()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "-1";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(false);
+    when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
+        .thenReturn(true);
+    // when
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockStudentOptions);
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnErrorPage_whenIdIsZero()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "0";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(false);
+    when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
+        .thenReturn(true);
+    // when
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockStudentOptions);
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnErrorPage_whenIdIsTooBig()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "12";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(false);
+    when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
+        .thenReturn(true);
+    // when
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockStudentOptions);
+  }
+
+  @Test
+  void testAddStudentPagePost_shouldReturnErrorPage_whenIdIsNotNumber()
+      throws Exception {
+    // given
+    String url = ("/3");
+    String firstName = "John";
+    String lastName = "Doe";
+    String groupId = "a";
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
+            .param("lastName", lastName).param("groupId", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+  }
+
 }
