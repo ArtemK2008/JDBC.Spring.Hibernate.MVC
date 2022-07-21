@@ -20,12 +20,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.service.CoursesOptions;
 import com.kalachev.task7.service.GroupOptions;
 import com.kalachev.task7.service.StudentOptions;
@@ -36,9 +38,13 @@ class SchoolControllerTest {
 
   static final String ERROR_PAGE = "bad";
   static final String NOT_INT = "not an int";
+  static final String NEGATIVE_INT = "-1";
 
   @Autowired
   SchoolController controller;
+
+  @Autowired
+  ApplicationEventPublisher publisher;
 
   @MockBean
   GroupOptions mockGroupOptions;
@@ -102,7 +108,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/1");
-    String size = "-1";
+    String size = NEGATIVE_INT;
     // when
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
@@ -228,6 +234,7 @@ class SchoolControllerTest {
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
     // when
+    publisher.publishEvent(new initializationEvent(this));
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
@@ -271,7 +278,7 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
-    String groupId = "-1";
+    String groupId = NEGATIVE_INT;
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
         lastName)).thenReturn(false);
@@ -337,12 +344,103 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
-    String groupId = "a";
+    String groupId = NOT_INT;
     // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name(ERROR_PAGE));
+  }
+
+  @Test
+  void testDeleteStudentPageGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/4");
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("delete-student"));
+  }
+
+  @Test
+  void testDeleteStudentPagePost_shouldReturnSuccesfullPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/4");
+    String groupId = "198";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
+    // when
+    publisher.publishEvent(new initializationEvent(this));
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+        .andExpect(view().name("redirect:/good"));
+    // then
+    verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockStudentOptions, times(1)).deleteStudentById(convertedId);
+  }
+
+  @Test
+  void testDeleteStudentPagePost_shouldReturnErrorPage_whenIdIsNotNumber()
+      throws Exception {
+    // given
+    String url = ("/4");
+    String groupId = NOT_INT;
+    // then
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+  }
+
+  @Test
+  void testDeleteStudentPagePost_shouldReturnErrorPage_whenIdIsNegative()
+      throws Exception {
+    // given
+    String url = ("/4");
+    String groupId = NEGATIVE_INT;
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockStudentOptions);
+  }
+
+  @Test
+  void testDeleteStudentPagePost_shouldReturnErrorPage_whenIdIsZero()
+      throws Exception {
+    // given
+    String url = ("/4");
+    String groupId = "0";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockStudentOptions);
+  }
+
+  @Test
+  void testDeleteStudentPagePost_shouldReturnErrorPage_whenIdNotExist()
+      throws Exception {
+    // given
+    String url = ("/4");
+    String groupId = "777";
+    int convertedId = Integer.parseInt(groupId);
+    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(false);
+    when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(false);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockStudentOptions, times(0)).deleteStudentById(convertedId);
   }
 
 }

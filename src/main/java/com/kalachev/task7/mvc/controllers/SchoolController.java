@@ -110,7 +110,11 @@ public class SchoolController {
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
-    sOptions.addNewStudent(firstName, lastName, id);
+    if (!sOptions.addNewStudent(firstName, lastName, id)) {
+      result = "Unexpected Error";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
     return GO_TO_SUCCESS_PAGE;
   }
 
@@ -123,18 +127,22 @@ public class SchoolController {
   public String handleDeleteStudent(@RequestParam("id") String id,
       Model model) {
     String result = ControllerUtills.validateStudentId(id);
-    if (result.equals(VALID)) {
-      int studentId = Integer.parseInt(id);
-      if (!sOptions.checkIfStudentIdExists(studentId)) {
-        result = "no such student";
-        model.addAttribute(RESULT, result);
-        return ERROR_PAGE;
-      }
-      sOptions.deleteStudentById(studentId);
-      return GO_TO_SUCCESS_PAGE;
+    if (!result.equals(VALID)) {
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
     }
-    model.addAttribute(RESULT, result);
-    return ERROR_PAGE;
+    int studentId = Integer.parseInt(id);
+    if (!sOptions.checkIfStudentIdExists(studentId)) {
+      result = "no such student";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    if (!sOptions.deleteStudentById(studentId)) {
+      result = "Unexpected Error";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    return GO_TO_SUCCESS_PAGE;
   }
 
   @GetMapping(value = "/5")
