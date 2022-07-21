@@ -20,14 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.service.CoursesOptions;
 import com.kalachev.task7.service.GroupOptions;
 import com.kalachev.task7.service.StudentOptions;
@@ -42,9 +40,6 @@ class SchoolControllerTest {
 
   @Autowired
   SchoolController controller;
-
-  @Autowired
-  ApplicationEventPublisher publisher;
 
   @MockBean
   GroupOptions mockGroupOptions;
@@ -234,7 +229,6 @@ class SchoolControllerTest {
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
     // when
-    publisher.publishEvent(new initializationEvent(this));
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
@@ -372,7 +366,6 @@ class SchoolControllerTest {
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
     // when
-    publisher.publishEvent(new initializationEvent(this));
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
         .andExpect(view().name("redirect:/good"));
     // then
@@ -441,6 +434,170 @@ class SchoolControllerTest {
     // then
     verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockStudentOptions, times(0)).deleteStudentById(convertedId);
+  }
+
+  @Test
+  void testAddToCoursePageGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/5");
+    List<String> courses = Arrays.asList("testCourse");
+    when(mockCourseOptions.findCourseNames()).thenReturn(courses);
+
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("add-to-course"))
+        .andExpect(model().attributeExists("courseList"))
+        .andExpect(model().attributeDoesNotExist("empty")).andExpect(
+            model().attribute("courseList", hasItems(courses.toArray())));
+    // then
+    verify(mockCourseOptions, times(1)).findCourseNames();
+  }
+
+  @Test
+  void testAddToCoursePageGet_shouldReturnEmptyAttribute_whenNoCoursesExist()
+      throws Exception {
+    // given
+    String url = ("/5");
+    List<String> courses = new ArrayList<>();
+    when(mockCourseOptions.findCourseNames()).thenReturn(courses);
+    // when
+    mockMvc.perform(get(url)).andExpect(view().name("add-to-course"))
+        .andExpect(model().attributeExists("empty"))
+        .andExpect(model().attributeExists("courseList"));
+    // then
+    verify(mockCourseOptions, times(1)).findCourseNames();
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnSuccesfullPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = "1";
+    String course = "valid course";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(false);
+    when(mockCourseOptions.addStudentToCourse(convertedId, course))
+        .thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name("redirect:/good"));
+    // then
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(1))
+        .checkIfStudentAlreadyInCourse(convertedId, course);
+    verify(mockCourseOptions, times(1)).addStudentToCourse(convertedId, course);
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnErrorPage_whenIdNotExist()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = "56565656";
+    String course = "valid course";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(false);
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(false);
+    when(mockCourseOptions.addStudentToCourse(convertedId, course))
+        .thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(0))
+        .checkIfStudentAlreadyInCourse(convertedId, course);
+    verify(mockCourseOptions, times(0)).addStudentToCourse(convertedId, course);
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnErrorPage_whenAlreadyInCourse()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = "1";
+    String course = "valid course";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(true);
+    when(mockCourseOptions.addStudentToCourse(convertedId, course))
+        .thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(1))
+        .checkIfStudentAlreadyInCourse(convertedId, course);
+    verify(mockCourseOptions, times(0)).addStudentToCourse(convertedId, course);
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnErrorPage_whenIdIsNegative()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = NEGATIVE_INT;
+    String course = "valid course";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(true);
+    when(mockCourseOptions.addStudentToCourse(convertedId, course))
+        .thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockCourseOptions);
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnErrorPage_whenIdIsZero()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = "0";
+    String course = "valid course";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(true);
+    when(mockCourseOptions.addStudentToCourse(convertedId, course))
+        .thenReturn(true);
+    // when
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name(ERROR_PAGE));
+    // then
+    verifyNoInteractions(mockCourseOptions);
+  }
+
+  @Test
+  void testAddToCoursePagePost_shouldReturnErrorPage_whenIdIsNotNumber()
+      throws Exception {
+    // given
+    String url = ("/5");
+    String studentId = NOT_INT;
+    String course = "valid course";
+    // then
+    mockMvc.perform(MockMvcRequestBuilders.post(url)
+        .param("studentId", studentId).param("course", course))
+        .andExpect(view().name(ERROR_PAGE));
   }
 
 }
