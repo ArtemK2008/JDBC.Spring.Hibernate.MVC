@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -37,6 +38,7 @@ class SchoolControllerTest {
   static final String ERROR_PAGE = "bad";
   static final String NOT_INT = "not an int";
   static final String NEGATIVE_INT = "-1";
+  static final String ZERO = "0";
 
   @Autowired
   SchoolController controller;
@@ -67,6 +69,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/");
+    // when
     MockMvc mockMvc = standaloneSetup(controller).build();
     // then
     mockMvc.perform(get(url)).andExpect(view().name("school"));
@@ -77,7 +80,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/1");
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("group-size"));
   }
 
@@ -88,13 +91,13 @@ class SchoolControllerTest {
     String url = ("/1");
     List<String> expected = new ArrayList<>();
     expected.add("Group A");
+    // when
     String size = "20";
     int iSize = Integer.parseInt(size);
     when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name("size-handling-page"));
-    // then
     verify(mockGroupOptions, times(1)).findBySize(iSize);
   }
 
@@ -103,11 +106,11 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/1");
-    String size = NEGATIVE_INT;
     // when
+    String size = NEGATIVE_INT;
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockGroupOptions);
   }
 
@@ -116,11 +119,11 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/1");
-    String size = "a";
     // when
+    String size = NOT_INT;
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockGroupOptions);
   }
 
@@ -129,14 +132,14 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/1");
-    List<String> expected = new ArrayList<>();
     String size = "20";
     int iSize = Integer.parseInt(size);
-    when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
     // when
+    List<String> expected = new ArrayList<>();
+    when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verify(mockGroupOptions, times(1)).findBySize(iSize);
   }
 
@@ -145,15 +148,14 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/2");
+    // when
     List<String> courses = Arrays.asList("testCourse");
     when(mockCourseOptions.findCourseNames()).thenReturn(courses);
-
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("find-by-course"))
         .andExpect(model().attributeExists("courseList"))
         .andExpect(model().attributeDoesNotExist("empty")).andExpect(
             model().attribute("courseList", hasItems(courses.toArray())));
-    // then
     verify(mockCourseOptions, times(1)).findCourseNames();
   }
 
@@ -162,13 +164,13 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/2");
+    // when
     List<String> courses = new ArrayList<>();
     when(mockCourseOptions.findCourseNames()).thenReturn(courses);
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("find-by-course"))
         .andExpect(model().attributeExists("empty"))
         .andExpect(model().attributeExists("courseList"));
-    // then
     verify(mockCourseOptions, times(1)).findCourseNames();
   }
 
@@ -178,15 +180,15 @@ class SchoolControllerTest {
     // given
     String url = ("/2");
     List<String> expected = Arrays.asList("Student A");
-    String course = "Test Course";
-    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
     // when
+    String course = "Valid Course";
+    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
         .andExpect(view().name("find-by-course-student-list"))
         .andExpect(model().attributeExists("students"))
         .andExpect(model().attributeExists("course"))
         .andExpect(model().attribute("students", hasItems(expected.toArray())));
-    // then
     verify(mockStudentOptions, times(1)).findByCourse(course);
   }
 
@@ -195,14 +197,14 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/2");
-    List<String> expected = new ArrayList<>();
     String course = "Test Course";
-    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
     // when
+    List<String> expected = new ArrayList<>();
+    when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
         .andExpect(view().name(ERROR_PAGE))
         .andExpect(model().attributeExists("result"));
-    // then
     verify(mockStudentOptions, times(1)).findByCourse(course);
   }
 
@@ -211,7 +213,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/3");
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("add-student"));
   }
 
@@ -222,18 +224,18 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
+    // when
     String groupId = "1";
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
         lastName)).thenReturn(false);
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
-    // when
+    // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name("redirect:/good"));
-    // then
     verify(mockStudentOptions, times(1))
         .checkIfStudentAlreadyInGroup(convertedId, firstName, lastName);
     verify(mockStudentOptions, times(1)).addNewStudent(firstName, lastName,
@@ -249,16 +251,16 @@ class SchoolControllerTest {
     String lastName = "Doe";
     String groupId = "1";
     int convertedId = Integer.parseInt(groupId);
-    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
-        lastName)).thenReturn(true);
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
     // when
+    when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
+        lastName)).thenReturn(true);
+    // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verify(mockStudentOptions, times(1))
         .checkIfStudentAlreadyInGroup(convertedId, firstName, lastName);
     verify(mockStudentOptions, times(0)).addNewStudent(firstName, lastName,
@@ -272,18 +274,18 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
+    // when
     String groupId = NEGATIVE_INT;
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
         lastName)).thenReturn(false);
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
-    // when
+    // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockStudentOptions);
   }
 
@@ -294,18 +296,18 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
-    String groupId = "0";
+    // when
+    String groupId = ZERO;
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
         lastName)).thenReturn(false);
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
-    // when
+    // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockStudentOptions);
   }
 
@@ -316,18 +318,18 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
+    // when
     String groupId = "12";
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentAlreadyInGroup(convertedId, firstName,
         lastName)).thenReturn(false);
     when(mockStudentOptions.addNewStudent(firstName, lastName, convertedId))
         .thenReturn(true);
-    // when
+    // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("firstName", firstName)
             .param("lastName", lastName).param("groupId", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockStudentOptions);
   }
 
@@ -338,6 +340,7 @@ class SchoolControllerTest {
     String url = ("/3");
     String firstName = "John";
     String lastName = "Doe";
+    // when
     String groupId = NOT_INT;
     // then
     mockMvc
@@ -351,7 +354,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/4");
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("delete-student"));
   }
 
@@ -360,15 +363,15 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/4");
+    // when
     String groupId = "198";
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
         .andExpect(view().name("redirect:/good"));
-    // then
     verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockStudentOptions, times(1)).deleteStudentById(convertedId);
   }
@@ -378,6 +381,7 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/4");
+    // when
     String groupId = NOT_INT;
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
@@ -389,15 +393,15 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/4");
+    // when
     String groupId = NEGATIVE_INT;
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockStudentOptions);
   }
 
@@ -406,15 +410,15 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/4");
-    String groupId = "0";
+    // when
+    String groupId = ZERO;
     int convertedId = Integer.parseInt(groupId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockStudentOptions);
   }
 
@@ -425,13 +429,13 @@ class SchoolControllerTest {
     String url = ("/4");
     String groupId = "777";
     int convertedId = Integer.parseInt(groupId);
-    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
-        .thenReturn(false);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(false);
     // when
+    when(mockStudentOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(false);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockStudentOptions, times(0)).deleteStudentById(convertedId);
   }
@@ -441,15 +445,14 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
+    // when
     List<String> courses = Arrays.asList("testCourse");
     when(mockCourseOptions.findCourseNames()).thenReturn(courses);
-
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("add-to-course"))
         .andExpect(model().attributeExists("courseList"))
         .andExpect(model().attributeDoesNotExist("empty")).andExpect(
             model().attribute("courseList", hasItems(courses.toArray())));
-    // then
     verify(mockCourseOptions, times(1)).findCourseNames();
   }
 
@@ -458,13 +461,13 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
+    // when
     List<String> courses = new ArrayList<>();
     when(mockCourseOptions.findCourseNames()).thenReturn(courses);
-    // when
+    // then
     mockMvc.perform(get(url)).andExpect(view().name("add-to-course"))
         .andExpect(model().attributeExists("empty"))
         .andExpect(model().attributeExists("courseList"));
-    // then
     verify(mockCourseOptions, times(1)).findCourseNames();
   }
 
@@ -473,8 +476,9 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
-    String studentId = "1";
     String course = "valid course";
+    // when
+    String studentId = "1";
     int convertedId = Integer.parseInt(studentId);
     when(mockCourseOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
@@ -482,11 +486,10 @@ class SchoolControllerTest {
         .thenReturn(false);
     when(mockCourseOptions.addStudentToCourse(convertedId, course))
         .thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name("redirect:/good"));
-    // then
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(1))
         .checkIfStudentAlreadyInCourse(convertedId, course);
@@ -501,17 +504,17 @@ class SchoolControllerTest {
     String studentId = "56565656";
     String course = "valid course";
     int convertedId = Integer.parseInt(studentId);
-    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
-        .thenReturn(false);
     when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
         .thenReturn(false);
     when(mockCourseOptions.addStudentToCourse(convertedId, course))
         .thenReturn(true);
     // when
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(false);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(0))
         .checkIfStudentAlreadyInCourse(convertedId, course);
@@ -528,15 +531,15 @@ class SchoolControllerTest {
     int convertedId = Integer.parseInt(studentId);
     when(mockCourseOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
-    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
-        .thenReturn(true);
     when(mockCourseOptions.addStudentToCourse(convertedId, course))
         .thenReturn(true);
     // when
+    when(mockCourseOptions.checkIfStudentAlreadyInCourse(convertedId, course))
+        .thenReturn(true);
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(1))
         .checkIfStudentAlreadyInCourse(convertedId, course);
@@ -548,8 +551,9 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
-    String studentId = NEGATIVE_INT;
     String course = "valid course";
+    // when
+    String studentId = NEGATIVE_INT;
     int convertedId = Integer.parseInt(studentId);
     when(mockCourseOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
@@ -557,11 +561,10 @@ class SchoolControllerTest {
         .thenReturn(true);
     when(mockCourseOptions.addStudentToCourse(convertedId, course))
         .thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockCourseOptions);
   }
 
@@ -570,8 +573,9 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
-    String studentId = "0";
     String course = "valid course";
+    // when
+    String studentId = ZERO;
     int convertedId = Integer.parseInt(studentId);
     when(mockCourseOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
@@ -579,11 +583,10 @@ class SchoolControllerTest {
         .thenReturn(true);
     when(mockCourseOptions.addStudentToCourse(convertedId, course))
         .thenReturn(true);
-    // when
+    // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name(ERROR_PAGE));
-    // then
     verifyNoInteractions(mockCourseOptions);
   }
 
@@ -592,12 +595,186 @@ class SchoolControllerTest {
       throws Exception {
     // given
     String url = ("/5");
-    String studentId = NOT_INT;
     String course = "valid course";
+    // when
+    String studentId = NOT_INT;
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
         .param("studentId", studentId).param("course", course))
         .andExpect(view().name(ERROR_PAGE));
+  }
+
+  @Test
+  void testRemoveFromCoursePageGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/6");
+    // then
+    mockMvc.perform(get(url)).andExpect(view().name("remove-from-course"));
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldRedirectToNextPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/6");
+    List<String> studentCourses = Arrays.asList("course1", "course2");
+    // when
+    String studentId = "1";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.findCourseNamesByID(convertedId))
+        .thenReturn(studentCourses);
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name("redirect:/complete-removing"))
+        .andExpect(flash().attributeExists("courses"))
+        .andExpect(flash().attributeExists("id"));
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(1)).findCourseNamesByID(convertedId);
+  }
+
+  @Test
+  void testRemoveFromCourseCompleteGet_shouldReturnRightPage_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/complete-removing");
+    // then
+    mockMvc.perform(get(url))
+        .andExpect(view().name("remove-from-course-choose-course"));
+  }
+
+  @Test
+  void testRemoveFromCourseCompletePost_shouldFinishRemoving_whenRequestIsValid()
+      throws Exception {
+    // given
+    String url = ("/complete-removing");
+    String course = "valid course";
+    // when
+    String id = "1";
+    int convertedId = Integer.parseInt(id);
+    when(mockCourseOptions.removeStudentFromCourse(convertedId, course))
+        .thenReturn(true);
+    // then
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", id)
+        .param("course", course)).andExpect(view().name("redirect:/good"));
+    verify(mockCourseOptions, times(1)).removeStudentFromCourse(convertedId,
+        course);
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldErrorPage_whenIdIsNotAnInt()
+      throws Exception {
+    // given
+    String url = ("/6");
+    // when
+    String studentId = NOT_INT;
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name(ERROR_PAGE));
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldErrorPage_whenIdIsNegative()
+      throws Exception {
+    // given
+    String url = ("/6");
+    List<String> studentCourses = Arrays.asList("course1", "course2");
+    // when
+    String studentId = NEGATIVE_INT;
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.findCourseNamesByID(convertedId))
+        .thenReturn(studentCourses);
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name(ERROR_PAGE));
+    verifyNoInteractions(mockCourseOptions);
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldErrorPage_whenIdIsZero()
+      throws Exception {
+    // given
+    String url = ("/6");
+    List<String> studentCourses = Arrays.asList("course1", "course2");
+    // when
+    String studentId = ZERO;
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.findCourseNamesByID(convertedId))
+        .thenReturn(studentCourses);
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name(ERROR_PAGE));
+    verifyNoInteractions(mockCourseOptions);
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldErrorPage_whenIdNotExist()
+      throws Exception {
+    // given
+    String url = ("/6");
+    List<String> studentCourses = Arrays.asList("course1", "course2");
+    // when
+    String studentId = "77777";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(false);
+    when(mockCourseOptions.findCourseNamesByID(convertedId))
+        .thenReturn(studentCourses);
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name(ERROR_PAGE));
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(0)).findCourseNamesByID(convertedId);
+  }
+
+  @Test
+  void testRemoveFromCoursePagePost_shouldErrorPage_whenStudentHasNoCourses()
+      throws Exception {
+    // given
+    String url = ("/6");
+    List<String> studentCourses = new ArrayList<>();
+    // when
+    String studentId = "7";
+    int convertedId = Integer.parseInt(studentId);
+    when(mockCourseOptions.checkIfStudentIdExists(convertedId))
+        .thenReturn(true);
+    when(mockCourseOptions.findCourseNamesByID(convertedId))
+        .thenReturn(studentCourses);
+    // then
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
+        .andExpect(view().name(ERROR_PAGE));
+    verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
+    verify(mockCourseOptions, times(1)).findCourseNamesByID(convertedId);
+  }
+
+  @Test
+  void testRemoveFromCourseCompletePost_shouldErrorPage_whenOperationFails()
+      throws Exception {
+    // given
+    String url = ("/complete-removing");
+    String id = "1";
+    String course = "valid course";
+    int convertedId = Integer.parseInt(id);
+    // when
+    when(mockCourseOptions.removeStudentFromCourse(convertedId, course))
+        .thenReturn(false);
+    // then
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", id)
+        .param("course", course)).andExpect(view().name(ERROR_PAGE));
+    verify(mockCourseOptions, times(1)).removeStudentFromCourse(convertedId,
+        course);
   }
 
 }

@@ -21,7 +21,6 @@ import com.kalachev.task7.utilities.ControllerUtills;
 @RequestMapping("/")
 public class SchoolController {
 
-  static final String GO_TO_ERROR_PAGE = "redirect:/bad";
   static final String ERROR_PAGE = "bad";
   static final String GO_TO_SUCCESS_PAGE = "redirect:/good";
   static final String SUCCESS_PAGE = "good";
@@ -160,23 +159,27 @@ public class SchoolController {
       @RequestParam("course") String course, Model model) {
 
     String result = ControllerUtills.validateStudentId(studentId);
-    if (result.equals(VALID)) {
-      int id = Integer.parseInt(studentId);
-      if (!cOptions.checkIfStudentIdExists(id)) {
-        result = "There is no student with such id";
-        model.addAttribute(RESULT, result);
-        return ERROR_PAGE;
-      }
-      if (cOptions.checkIfStudentAlreadyInCourse(id, course)) {
-        result = "student already in course";
-        model.addAttribute(RESULT, result);
-        return ERROR_PAGE;
-      }
-      cOptions.addStudentToCourse(id, course);
-      return GO_TO_SUCCESS_PAGE;
+    if (!result.equals(VALID)) {
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
     }
-    model.addAttribute(RESULT, result);
-    return ERROR_PAGE;
+    int id = Integer.parseInt(studentId);
+    if (!cOptions.checkIfStudentIdExists(id)) {
+      result = "There is no student with such id";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    if (cOptions.checkIfStudentAlreadyInCourse(id, course)) {
+      result = "student already in course";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    if (!cOptions.addStudentToCourse(id, course)) {
+      result = "Unexpected Error";
+      model.addAttribute(RESULT, result);
+      return ERROR_PAGE;
+    }
+    return GO_TO_SUCCESS_PAGE;
   }
 
   @GetMapping(value = "/6")
@@ -204,8 +207,8 @@ public class SchoolController {
     if (coursesOfAStudent.isEmpty()) {
       model.addAttribute(RESULT,
           "Student with id " + studentId + " is not enrolled in any course");
+      return ERROR_PAGE;
     }
-
     redirectAttributes.addFlashAttribute("courses", coursesOfAStudent);
     redirectAttributes.addFlashAttribute("id", studentId);
     return "redirect:/complete-removing";
@@ -223,7 +226,7 @@ public class SchoolController {
     if (isRemoved) {
       return GO_TO_SUCCESS_PAGE;
     }
-    return GO_TO_ERROR_PAGE;
+    return ERROR_PAGE;
   }
 
   @GetMapping("bad")
