@@ -87,10 +87,11 @@ class GroupControllerTest {
     int iSize = Integer.parseInt(size);
     when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("minGroupSize", size))
         .andExpect(view().name("redirect:" + PROCEED_FILTER_PAGE))
         .andExpect(flash().attributeExists("groups"))
-        .andExpect(flash().attributeExists("size"));
+        .andExpect(flash().attributeExists("minGroupSize"));
     verify(mockGroupOptions, times(1)).findBySize(iSize);
   }
 
@@ -102,7 +103,8 @@ class GroupControllerTest {
     // when
     String size = NEGATIVE_INT;
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("minGroupSize", size))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockGroupOptions);
   }
@@ -115,7 +117,8 @@ class GroupControllerTest {
     // when
     String size = NOT_INT;
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("minGroupSize", size))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockGroupOptions);
   }
@@ -131,7 +134,8 @@ class GroupControllerTest {
     List<String> expected = new ArrayList<>();
     when(mockGroupOptions.findBySize(iSize)).thenReturn(expected);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("size", size))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("minGroupSize", size))
         .andExpect(view().name(ERROR_PAGE));
     verify(mockGroupOptions, times(1)).findBySize(iSize);
   }

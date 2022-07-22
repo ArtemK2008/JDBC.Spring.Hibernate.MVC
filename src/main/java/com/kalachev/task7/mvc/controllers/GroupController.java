@@ -29,14 +29,15 @@ public class GroupController {
   }
 
   @PostMapping("/filter-by-group-size")
-  public String handleSizeFiltering(@RequestParam("size") String size,
-      Model model, RedirectAttributes redirectAttributes) {
-    String result = ControllerUtills.validateSize(size);
+  public String handleSizeFiltering(
+      @RequestParam("minGroupSize") String minSize, Model model,
+      RedirectAttributes redirectAttributes) {
+    String result = ControllerUtills.validateSize(minSize);
     if (!result.equals(VALID)) {
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
-    int validSize = Integer.parseInt(size);
+    int validSize = Integer.parseInt(minSize);
     List<String> groups = groupOptions.findBySize(validSize);
     if (groups.isEmpty()) {
       result = "no groups found";
@@ -44,7 +45,7 @@ public class GroupController {
       return ERROR_PAGE;
     }
     redirectAttributes.addFlashAttribute("groups", groups);
-    redirectAttributes.addFlashAttribute("size", size);
+    redirectAttributes.addFlashAttribute("minGroupSize", minSize);
     return "redirect:/proceed-group-filter";
   }
 

@@ -127,10 +127,11 @@ class CoursesControllerTest {
     String course = "Valid Course";
     when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("courseName", course))
         .andExpect(view().name("redirect:" + PROCEED_FIND_BY_COURSE))
         .andExpect(flash().attributeExists("students"))
-        .andExpect(flash().attributeExists("course"))
+        .andExpect(flash().attributeExists("courseName"))
         .andExpect(flash().attribute("students", hasItems(expected.toArray())));
     verify(mockStudentOptions, times(1)).findByCourse(course);
   }
@@ -145,7 +146,8 @@ class CoursesControllerTest {
     List<String> expected = new ArrayList<>();
     when(mockStudentOptions.findByCourse(course)).thenReturn(expected);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("course", course))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE))
         .andExpect(model().attributeExists("result"));
     verify(mockStudentOptions, times(1)).findByCourse(course);
@@ -209,7 +211,7 @@ class CoursesControllerTest {
     // then
     mockMvc
         .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId)
-            .param("course", course))
+            .param("courseName", course))
         .andExpect(view().name("redirect:" + FINISH_ADDING_TO_COURSE_PAGE));
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(1))
@@ -234,7 +236,7 @@ class CoursesControllerTest {
         .thenReturn(false);
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
-        .param("studentId", studentId).param("course", course))
+        .param("studentId", studentId).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE));
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(0))
@@ -259,7 +261,7 @@ class CoursesControllerTest {
         .thenReturn(true);
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
-        .param("studentId", studentId).param("course", course))
+        .param("studentId", studentId).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE));
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(1))
@@ -284,7 +286,7 @@ class CoursesControllerTest {
         .thenReturn(true);
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
-        .param("studentId", studentId).param("course", course))
+        .param("studentId", studentId).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockCourseOptions);
   }
@@ -306,7 +308,7 @@ class CoursesControllerTest {
         .thenReturn(true);
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
-        .param("studentId", studentId).param("course", course))
+        .param("studentId", studentId).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockCourseOptions);
   }
@@ -321,7 +323,7 @@ class CoursesControllerTest {
     String studentId = NOT_INT;
     // then
     mockMvc.perform(MockMvcRequestBuilders.post(url)
-        .param("studentId", studentId).param("course", course))
+        .param("studentId", studentId).param("courseName", course))
         .andExpect(view().name(ERROR_PAGE));
   }
 
@@ -370,7 +372,7 @@ class CoursesControllerTest {
         .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name("redirect:" + PROCEED_REMOVE_FROM_COURSE))
         .andExpect(flash().attributeExists("courses"))
-        .andExpect(flash().attributeExists("id"));
+        .andExpect(flash().attributeExists("studId"));
     verify(mockCourseOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockCourseOptions, times(1)).findCourseNamesByID(convertedId);
   }
@@ -388,8 +390,8 @@ class CoursesControllerTest {
         .thenReturn(true);
     // then
     mockMvc
-        .perform(MockMvcRequestBuilders.post(url).param("id", id)
-            .param("course", course))
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", id)
+            .param("courseName", course))
         .andExpect(view().name("redirect:" + FINISH_REMOVE_FROM_COURSE));
     verify(mockCourseOptions, times(1)).removeStudentFromCourse(convertedId,
         course);
@@ -502,8 +504,8 @@ class CoursesControllerTest {
     when(mockCourseOptions.removeStudentFromCourse(convertedId, course))
         .thenReturn(false);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", id)
-        .param("course", course)).andExpect(view().name(ERROR_PAGE));
+    mockMvc.perform(MockMvcRequestBuilders.post(url).param("studentId", id)
+        .param("courseName", course)).andExpect(view().name(ERROR_PAGE));
     verify(mockCourseOptions, times(1)).removeStudentFromCourse(convertedId,
         course);
   }

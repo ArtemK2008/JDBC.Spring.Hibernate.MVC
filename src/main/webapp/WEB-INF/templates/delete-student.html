@@ -7,14 +7,12 @@
 <body>
 	<h1>choose id of a student you want to delete</h1>
 	
-	<form method="POST" th:action="@{/remove}" th:object="${student}">
+	<form method="POST" th:action="@{/remove}" >
 		<table>
 			<tr>
 				<td>id</td>
-				<td><input type="text" th:name="id"
-					th:field="*{id}" value="Enter id to delete" /></td>
-				<td th:if="${#fields.hasErrors('id')}"
-					th:errors="*{id}">id Error</td>
+				<td><input type="text" th:name="studentId"
+					 value="Enter id to delete" /></td>
 			</tr>
 			<tr>
 				<td><button type="submit">Submit</button></td>

@@ -60,25 +60,25 @@ public class StudentController {
   }
 
   @GetMapping("/remove")
-  public String deleteStudent(Student student) {
+  public String deleteStudent() {
     return "delete-student";
   }
 
   @PostMapping("/remove")
-  public String handleDeleteStudent(@RequestParam("id") String id,
+  public String handleDeleteStudent(@RequestParam("studentId") String studentId,
       Model model) {
-    String result = ControllerUtills.validateStudentId(id);
+    String result = ControllerUtills.validateStudentId(studentId);
     if (!result.equals(VALID)) {
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
-    int studentId = Integer.parseInt(id);
-    if (!studentOptions.checkIfStudentIdExists(studentId)) {
+    int id = Integer.parseInt(studentId);
+    if (!studentOptions.checkIfStudentIdExists(id)) {
       result = "no such student";
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
-    if (!studentOptions.deleteStudentById(studentId)) {
+    if (!studentOptions.deleteStudentById(id)) {
       result = UNEXPECTED_ERROR;
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;

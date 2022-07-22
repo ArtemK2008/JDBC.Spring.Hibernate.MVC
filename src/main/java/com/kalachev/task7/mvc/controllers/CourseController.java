@@ -40,7 +40,7 @@ public class CourseController {
   }
 
   @PostMapping(value = "/find-all-course-students")
-  public String handleFindStudents(@RequestParam("course") String course,
+  public String handleFindStudents(@RequestParam("courseName") String course,
       Model model, RedirectAttributes redirectAttributes) {
     List<String> courseStudents = studentOptions.findByCourse(course);
     if (courseStudents.isEmpty()) {
@@ -48,7 +48,7 @@ public class CourseController {
       return ERROR_PAGE;
     }
     redirectAttributes.addFlashAttribute("students", courseStudents);
-    redirectAttributes.addFlashAttribute("course", course);
+    redirectAttributes.addFlashAttribute("courseName", course);
     return "redirect:/proceed-find-students";
   }
 
@@ -69,7 +69,7 @@ public class CourseController {
 
   @PostMapping("/add-student-to-course")
   public String handleAddToCourse(@RequestParam("studentId") String studentId,
-      @RequestParam("course") String course, Model model,
+      @RequestParam("courseName") String course, Model model,
       RedirectAttributes redirectAttributes) {
 
     String result = ControllerUtills.validateStudentId(studentId);
@@ -129,7 +129,7 @@ public class CourseController {
       return ERROR_PAGE;
     }
     redirectAttributes.addFlashAttribute("courses", coursesOfAStudent);
-    redirectAttributes.addFlashAttribute("id", studentId);
+    redirectAttributes.addFlashAttribute("studId", studentId);
     return "redirect:/proceed-removing";
   }
 
@@ -139,8 +139,9 @@ public class CourseController {
   }
 
   @PostMapping("/proceed-removing")
-  public String handleRemoveFromCourse(@RequestParam("course") String course,
-      @RequestParam("id") Integer id) {
+  public String handleRemoveFromCourse(
+      @RequestParam("courseName") String course,
+      @RequestParam("studentId") Integer id) {
     boolean isRemoved = coursesOptions.removeStudentFromCourse(id, course);
     if (!isRemoved) {
       return ERROR_PAGE;

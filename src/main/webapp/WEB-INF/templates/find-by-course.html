@@ -16,7 +16,7 @@
 
 		<form action="#" method="POST" th:action="@{/find-all-course-students}"
 			th:object="${courseList}">
-			<select name="course" th:object="${courseList}">
+			<select name="courseName" th:object="${courseList}">
 				<option th:each="course : ${courseList}" th:value="${course}"
 					th:name="${course}" th:text="${course}"></option>
 			</select> <input type="submit" value="find students" />

@@ -11,22 +11,16 @@
 				<td>First Name:</td>
 				<td><input type="text" th:name="firstName"
 					th:field="*{firstName}" value="Enter first name" /></td>
-				<td th:if="${#fields.hasErrors('firstName')}"
-					th:errors="*{firstName}">Name Error</td>
 			</tr>
 			<tr>
 				<td>Last Name</td>
 				<td><input type="text" th:name="lastName"
 					th:field="*{lastName}" value="Enter Last Name" /></td>
-				<td th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">last
-					name error</td>
 			</tr>
 			<tr>
 				<td>group id</td>
 				<td><input type="text" th:name="groupId" th:field="*{groupId}"
 					value="Enter ID" /></td>
-				<td th:if="${#fields.hasErrors('groupId')}" th:errors="*{groupId}">group
-					error</td>
 			</tr>
 			<tr>
 				<td><button type="submit">Submit</button></td>

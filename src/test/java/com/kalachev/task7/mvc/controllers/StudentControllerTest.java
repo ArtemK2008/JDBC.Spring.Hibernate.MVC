@@ -232,13 +232,14 @@ class StudentControllerTest {
     // given
     String url = (REMOVE_URL);
     // when
-    String groupId = "198";
-    int convertedId = Integer.parseInt(groupId);
+    String studentId = "198";
+    int convertedId = Integer.parseInt(studentId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name("redirect:" + PROCEED_REMOVE_STUDENT_PAGE));
     verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockStudentOptions, times(1)).deleteStudentById(convertedId);
@@ -250,9 +251,10 @@ class StudentControllerTest {
     // given
     String url = (REMOVE_URL);
     // when
-    String groupId = NOT_INT;
+    String studentId = NOT_INT;
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name(ERROR_PAGE));
   }
 
@@ -262,13 +264,14 @@ class StudentControllerTest {
     // given
     String url = (REMOVE_URL);
     // when
-    String groupId = NEGATIVE_INT;
-    int convertedId = Integer.parseInt(groupId);
+    String studentId = NEGATIVE_INT;
+    int convertedId = Integer.parseInt(studentId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockStudentOptions);
   }
@@ -279,13 +282,14 @@ class StudentControllerTest {
     // given
     String url = (REMOVE_URL);
     // when
-    String groupId = ZERO;
-    int convertedId = Integer.parseInt(groupId);
+    String studentId = ZERO;
+    int convertedId = Integer.parseInt(studentId);
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(true);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(true);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name(ERROR_PAGE));
     verifyNoInteractions(mockStudentOptions);
   }
@@ -295,14 +299,15 @@ class StudentControllerTest {
       throws Exception {
     // given
     String url = (REMOVE_URL);
-    String groupId = "777";
-    int convertedId = Integer.parseInt(groupId);
+    String studentId = "777";
+    int convertedId = Integer.parseInt(studentId);
     when(mockStudentOptions.deleteStudentById(convertedId)).thenReturn(false);
     // when
     when(mockStudentOptions.checkIfStudentIdExists(convertedId))
         .thenReturn(false);
     // then
-    mockMvc.perform(MockMvcRequestBuilders.post(url).param("id", groupId))
+    mockMvc
+        .perform(MockMvcRequestBuilders.post(url).param("studentId", studentId))
         .andExpect(view().name(ERROR_PAGE));
     verify(mockStudentOptions, times(1)).checkIfStudentIdExists(convertedId);
     verify(mockStudentOptions, times(0)).deleteStudentById(convertedId);

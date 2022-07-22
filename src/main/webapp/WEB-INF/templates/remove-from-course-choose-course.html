@@ -7,11 +7,11 @@ type="text/css"
 th:href="@{/resources/style.css}"></link>
 </head>
 <body>
-<h1>Choose a course you want to delete student <span th:text = "${id}">studentId</span> from</h1>
+<h1>Choose a course you want to delete student <span th:text = "${studId}">studentId</span> from</h1>
 	
 	<form action = "#" method="POST" th:action="@{/proceed-removing/}" th:object = "${courses}">
-	<input type = "hidden" name="id" th:value = "${id}" />
-		<select name = "course" th:object="${courses}">
+	<input type = "hidden" name="studentId" th:value = "${studId}" />
+		<select name = "courseName" th:object="${courses}">
 			<option th:each="course : ${courses}" th:value="${course}" th:name = "${course}"
 				th:text="${course}"></option>
 		</select>

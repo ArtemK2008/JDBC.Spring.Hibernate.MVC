@@ -2,14 +2,8 @@ package com.kalachev.task7.dao.entities;
 
 import java.util.Objects;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
 public class Student {
-  @Min(1)
   private int id;
-  @Min(1)
-  @Max(1)
   private int groupId;
 
   private String firstName;

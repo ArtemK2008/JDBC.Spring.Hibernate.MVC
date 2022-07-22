@@ -7,7 +7,7 @@ type="text/css"
 th:href="@{/resources/style.css}"></link>
 </head>
 <body>
-<h1>groups with size more then <span th:text ="${size}">size</span></h1>
+<h1>groups with size more then <span th:text ="${minGroupSize}">size</span></h1>
 <div th:if="${groups.size != null}">
     <h1>Result</h1>
     <ul>
