@@ -14,7 +14,7 @@
 	<div th:if="${empty == null}">
 		<h1>choose a course to see its students</h1>
 
-		<form action="#" method="POST" th:action="@{/2}"
+		<form action="#" method="POST" th:action="@{/find-all-course-students}"
 			th:object="${courseList}">
 			<select name="course" th:object="${courseList}">
 				<option th:each="course : ${courseList}" th:value="${course}"

@@ -14,7 +14,7 @@
 	<div th:if="${empty == null}">
 		<h1>enter student and course you want him to be added</h1>
 
-		<form action="#" method="POST" th:action="@{/5}"
+		<form action="#" method="POST" th:action="@{/add-student-to-course}"
 			th:object="${courseList}">
 			<input type="text" th:name="studentId" placeholder="Enter ID"   />
 			<select name="course" th:object="${courseList}">
