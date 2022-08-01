@@ -13,6 +13,9 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.service.GroupOptions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,14 +26,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.service.GroupOptions;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
 class GroupControllerTest {
 
-  static final String ERROR_PAGE = "bad";
+  static final String ERROR_PAGE = "error-page";
   static final String NOT_INT = "not an int";
   static final String NEGATIVE_INT = "-1";
 

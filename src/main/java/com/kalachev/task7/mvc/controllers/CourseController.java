@@ -2,6 +2,10 @@ package com.kalachev.task7.mvc.controllers;
 
 import java.util.List;
 
+import com.kalachev.task7.service.CoursesOptions;
+import com.kalachev.task7.service.StudentOptions;
+import com.kalachev.task7.utilities.ValidationUtills;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,17 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.kalachev.task7.service.CoursesOptions;
-import com.kalachev.task7.service.StudentOptions;
-import com.kalachev.task7.utilities.ControllerUtills;
-
 @Controller
 public class CourseController {
 
-  static final String ERROR_PAGE = "bad";
+  static final String ERROR_PAGE = "error-page";
   static final String RESULT = "result";
-  static final String SUCCESS_PAGE = "good";
+  static final String SUCCESS_PAGE = "success-page";
   static final String VALID = "valid";
+  static final String NOT_VALID = "not valid";
   static final String UNEXPECTED_ERROR = "Unexpected Error";
 
   @Autowired
@@ -72,8 +73,12 @@ public class CourseController {
       @RequestParam("courseName") String course, Model model,
       RedirectAttributes redirectAttributes) {
 
-    String result = ControllerUtills.validateStudentId(studentId);
+    String result = ValidationUtills.validateInput(studentId, 1,
+        Integer.MAX_VALUE);
     if (!result.equals(VALID)) {
+      if (result.equals(NOT_VALID)) {
+        result = "Wrong student id";
+      }
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
@@ -111,8 +116,12 @@ public class CourseController {
       @RequestParam("studentId") String studentId,
       RedirectAttributes redirectAttributes, Model model) {
 
-    String result = ControllerUtills.validateStudentId(studentId);
+    String result = ValidationUtills.validateInput(studentId, 1,
+        Integer.MAX_VALUE);
     if (!result.equals(VALID)) {
+      if (result.equals(NOT_VALID)) {
+        result = "Wrong student id";
+      }
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
@@ -151,6 +160,16 @@ public class CourseController {
 
   @GetMapping("/finish-removing")
   public String removeResult() {
+    return SUCCESS_PAGE;
+  }
+
+  @GetMapping("/error-page")
+  public String badResult() {
+    return ERROR_PAGE;
+  }
+
+  @GetMapping("/success-page")
+  public String goodResult() {
     return SUCCESS_PAGE;
   }
 
