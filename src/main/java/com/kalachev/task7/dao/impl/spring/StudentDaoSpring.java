@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kalachev.task7.dao.StudentsDao;
+import com.kalachev.task7.dao.entities.Student;
+import com.kalachev.task7.dao.impl.spring.row_mappers.StudentRowMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Component;
-
-import com.kalachev.task7.dao.StudentsDao;
-import com.kalachev.task7.dao.entities.Student;
-import com.kalachev.task7.dao.impl.spring.row_mappers.StudentRowMapper;
 
 @Primary
 @Component

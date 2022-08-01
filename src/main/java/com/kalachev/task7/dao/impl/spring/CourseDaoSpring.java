@@ -2,16 +2,16 @@ package com.kalachev.task7.dao.impl.spring;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.stereotype.Component;
-
 import com.kalachev.task7.dao.CoursesDao;
 import com.kalachev.task7.dao.entities.Course;
 import com.kalachev.task7.dao.entities.Student;
 import com.kalachev.task7.dao.impl.spring.row_mappers.CourseRowMapper;
 import com.kalachev.task7.dao.impl.spring.row_mappers.StudentRowMapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.stereotype.Component;
 
 @Primary
 @Component

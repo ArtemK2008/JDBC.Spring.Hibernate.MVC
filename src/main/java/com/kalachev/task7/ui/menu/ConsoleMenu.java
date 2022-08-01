@@ -6,13 +6,13 @@ import java.util.Scanner;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
-
 import com.kalachev.task7.events.initializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.commands.Command;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ConsoleMenu {
@@ -56,6 +56,7 @@ public class ConsoleMenu {
         System.out.println(
             "Please enter an integer value between 1 and " + options.length);
       } catch (Exception ex) {
+        ex.printStackTrace();
         System.out.println("An unexpected error happened. Please try again");
       } finally {
         scanner.nextLine();

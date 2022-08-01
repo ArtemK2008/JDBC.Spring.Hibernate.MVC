@@ -2,9 +2,19 @@ package com.kalachev.task7.dao.entities;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name = "groups")
 public class Group {
 
+  @Id
+  @GeneratedValue
+  @Column(name = "group_id")
   private int id;
+  @Column(name = "group_name")
   private String groupName;
 
   public int getId() {

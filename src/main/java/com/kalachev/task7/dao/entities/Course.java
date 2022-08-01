@@ -1,12 +1,28 @@
 package com.kalachev.task7.dao.entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+@Entity(name = "courses")
 public class Course {
 
+  @Id
+  @GeneratedValue
+  @Column(name = "course_id")
   private int id;
+  @Column(name = "course_name")
   private String courseName;
+  @Column(name = "course_description")
   private String courseDescription;
+  @ManyToMany(mappedBy = "courses")
+  private List<Student> students = new ArrayList<>();
 
   public int getId() {
     return id;
@@ -30,6 +46,14 @@ public class Course {
 
   public void setCourseDescription(String courseDescription) {
     this.courseDescription = courseDescription;
+  }
+
+  public List<Student> getStudents() {
+    return students;
+  }
+
+  public void setStudents(List<Student> students) {
+    this.students = students;
   }
 
   @Override
