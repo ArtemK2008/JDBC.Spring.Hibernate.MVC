@@ -9,6 +9,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.service.StudentOptions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,24 +22,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.service.StudentOptions;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
 class StudentControllerTest {
 
-  static final String ERROR_PAGE = "bad";
-  static final String SUCCESS_PAGE = "good";
+  static final String ERROR_PAGE = "error-page";
+  static final String SUCCESS_PAGE = "success-page";
   static final String NOT_INT = "not an int";
   static final String NEGATIVE_INT = "-1";
   static final String ZERO = "0";
 
-  static final String ADD_URL = "/add";
-  static final String ADD_STUDENT_PAGE = "add-student";
+  static final String ADD_URL = "/add-student";
+  static final String ADD_STUDENT_PAGE = "insert-student";
   static final String PROCEED_ADD_STUDENT_PAGE = "/proceed-add-student";
 
-  static final String REMOVE_URL = "/remove";
+  static final String REMOVE_URL = "/remove-student";
   static final String REMOVE_STUDENT_PAGE = "delete-student";
   static final String PROCEED_REMOVE_STUDENT_PAGE = "/proceed-remove-student";
 

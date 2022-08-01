@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.service.CoursesOptions;
+import com.kalachev.task7.service.StudentOptions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,19 +30,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.service.CoursesOptions;
-import com.kalachev.task7.service.StudentOptions;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
 class CoursesControllerTest {
 
-  static final String ERROR_PAGE = "bad";
+  static final String ERROR_PAGE = "error-page";
   static final String NOT_INT = "not an int";
   static final String NEGATIVE_INT = "-1";
   static final String ZERO = "0";
-  static final String SUCCES_PAGE = "good";
+  static final String SUCCESS_PAGE = "success-page";
 
   static final String FIND_COURSE_STUDENTS_URL = "/find-all-course-students";
   static final String FIND_BY_COURSE_PAGE = "find-by-course";
@@ -190,7 +190,7 @@ class CoursesControllerTest {
     // given
     String url = (FINISH_ADDING_TO_COURSE_PAGE);
     // then
-    mockMvc.perform(get(url)).andExpect(view().name(SUCCES_PAGE));
+    mockMvc.perform(get(url)).andExpect(view().name(SUCCESS_PAGE));
   }
 
   @Test
@@ -351,7 +351,7 @@ class CoursesControllerTest {
     // given
     String url = (FINISH_REMOVE_FROM_COURSE);
     // then
-    mockMvc.perform(get(url)).andExpect(view().name(SUCCES_PAGE));
+    mockMvc.perform(get(url)).andExpect(view().name(SUCCESS_PAGE));
   }
 
   @Test

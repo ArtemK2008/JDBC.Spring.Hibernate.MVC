@@ -2,6 +2,9 @@ package com.kalachev.task7.mvc.controllers;
 
 import java.util.List;
 
+import com.kalachev.task7.service.GroupOptions;
+import com.kalachev.task7.utilities.ValidationUtills;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,15 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.kalachev.task7.service.GroupOptions;
-import com.kalachev.task7.utilities.ControllerUtills;
-
 @Controller
 public class GroupController {
 
-  static final String ERROR_PAGE = "bad";
+  static final String ERROR_PAGE = "error-page";
   static final String RESULT = "result";
   static final String VALID = "valid";
+  static final String NOT_VALID = "not valid";
 
   @Autowired
   GroupOptions groupOptions;
@@ -32,8 +33,12 @@ public class GroupController {
   public String handleSizeFiltering(
       @RequestParam("minGroupSize") String minSize, Model model,
       RedirectAttributes redirectAttributes) {
-    String result = ControllerUtills.validateSize(minSize);
+    String result = ValidationUtills.validateInput(minSize, 0,
+        Integer.MAX_VALUE);
     if (!result.equals(VALID)) {
+      if (result.equals(NOT_VALID)) {
+        result = "input was out of range";
+      }
       model.addAttribute(RESULT, result);
       return ERROR_PAGE;
     }
