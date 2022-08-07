@@ -1,19 +1,26 @@
 package com.kalachev.task7.dao.entities;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
-@Entity(name = "students")
+@Entity(name = "hstudents")
 public class Student {
   @Id
-  @GeneratedValue
+  @SequenceGenerator(name = "student_seq", sequenceName = "student_sequence", initialValue = 1, allocationSize = 5)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
   @Column(name = "student_id")
   private int id;
   @Column(name = "group_id")
@@ -22,8 +29,19 @@ public class Student {
   private String firstName;
   @Column(name = "last_name")
   private String lastName;
-  @ManyToMany
-  private List<Course> courses = new ArrayList<>();
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "hstudents_hcourses", joinColumns = {
+      @JoinColumn(name = "student_id") }, inverseJoinColumns = {
+          @JoinColumn(name = "course_id") })
+  private Set<Course> courses = new HashSet<>();
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "group_id", nullable = false, updatable = false, insertable = false)
+  private Group group;
+
+  public Student() {
+    super();
+  }
 
   public int getId() {
     return id;
@@ -57,12 +75,20 @@ public class Student {
     this.lastName = lastName;
   }
 
-  public List<Course> getCourses() {
+  public Set<Course> getCourses() {
     return courses;
   }
 
-  public void setCourses(List<Course> courses) {
+  public void setCourses(Set<Course> courses) {
     this.courses = courses;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public void setGroup(Group group) {
+    this.group = group;
   }
 
   @Override

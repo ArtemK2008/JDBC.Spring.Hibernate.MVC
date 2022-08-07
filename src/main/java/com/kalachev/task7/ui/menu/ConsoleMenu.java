@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import javax.annotation.Resource;
 
-import com.kalachev.task7.events.initializationEvent;
+import com.kalachev.task7.events.InitializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.commands.Command;
 
@@ -44,7 +44,7 @@ public class ConsoleMenu {
 
   public void runSchoolApp() {
     cleanConsole();
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     String option = "1";
     while (!"7".equals(option)) {
       printMenu(options);

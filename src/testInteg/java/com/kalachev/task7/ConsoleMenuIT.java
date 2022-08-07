@@ -34,7 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.events.initializationEvent;
+import com.kalachev.task7.events.InitializationEvent;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.ui.menu.ConsoleMenu;
 import com.kalachev.task7.utilities.ConnectionManager;
@@ -234,7 +234,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsNotInt()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(NOT_AN_INTEGER).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -257,7 +257,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsOutOfRange()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(HUGE_INT).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -280,7 +280,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldDeleteStudentFromDatabase_whenUserAsksToDelete()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     String expectedMessage = "student with id " + STUDENT_TO_DELETE_ID
         + " deleted";
     Mockito.when(mockScanner.next()).thenReturn("4")
@@ -307,7 +307,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdIsNotInt()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NOT_AN_INTEGER)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -330,7 +330,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotExists()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(HUGE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -353,7 +353,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenNegaiveId()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NEGAGTIVE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -409,7 +409,7 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenCourseNameWasWrong()
       throws Exception {
     // given
-    publisher.publishEvent(new initializationEvent(this));
+    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(COURSE + "is worng").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");

@@ -1,9 +1,9 @@
 package com.kalachev.task7.initialization;
 
-import com.kalachev.task7.events.initializationEvent;
+import com.kalachev.task7.events.InitializationEvent;
 
 public interface Initializer {
 
-  void initializeTablesEvent(initializationEvent event);
+  void initializeTablesEvent(InitializationEvent event);
 
 }

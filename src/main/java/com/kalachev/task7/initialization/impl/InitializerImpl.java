@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.kalachev.task7.dao.StudentsDao;
 import com.kalachev.task7.dao.impl.core.StudentsDaoImpl;
-import com.kalachev.task7.events.initializationEvent;
+import com.kalachev.task7.events.InitializationEvent;
 import com.kalachev.task7.initialization.CoursesInitializer;
 import com.kalachev.task7.initialization.GroupInitializer;
 import com.kalachev.task7.initialization.Initializer;
@@ -47,7 +47,7 @@ public class InitializerImpl implements Initializer {
 
   @EventListener
   @Override
-  public void initializeTablesEvent(initializationEvent event) {
+  public void initializeTablesEvent(InitializationEvent event) {
     initializeTables();
   }
 

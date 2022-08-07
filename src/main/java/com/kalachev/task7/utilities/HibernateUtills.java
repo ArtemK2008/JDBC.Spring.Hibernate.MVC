@@ -26,4 +26,9 @@ public class HibernateUtills {
     return configuration.buildSessionFactory(registry);
   }
 
+  public static void insert(Student student, Course course) {
+    student.getCourses().add(course);
+    course.getStudents().add(student);
+  }
+
 }

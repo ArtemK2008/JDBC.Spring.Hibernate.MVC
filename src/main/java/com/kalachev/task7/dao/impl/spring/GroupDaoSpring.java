@@ -2,16 +2,14 @@ package com.kalachev.task7.dao.impl.spring;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.stereotype.Component;
-
 import com.kalachev.task7.dao.GroupsDao;
 import com.kalachev.task7.dao.entities.Group;
 import com.kalachev.task7.dao.impl.spring.row_mappers.GroupRowMapper;
 
-@Primary
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.stereotype.Component;
+
 @Component
 public class GroupDaoSpring implements GroupsDao {
   @Autowired

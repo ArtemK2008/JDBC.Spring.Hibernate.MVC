@@ -1,21 +1,32 @@
 package com.kalachev.task7.dao.entities;
 
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-@Entity(name = "groups")
+@Entity(name = "hgroups")
 public class Group {
 
   @Id
-  @GeneratedValue
-  @Column(name = "group_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "group_id", nullable = false)
   private int id;
   @Column(name = "group_name")
   private String groupName;
+
+  @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+  private Set<Student> students;
+
+  public Group() {
+    super();
+  }
 
   public int getId() {
     return id;
@@ -31,6 +42,14 @@ public class Group {
 
   public void setGroupName(String groupName) {
     this.groupName = groupName;
+  }
+
+  public Set<Student> getStudents() {
+    return students;
+  }
+
+  public void setStudents(Set<Student> students) {
+    this.students = students;
   }
 
   @Override

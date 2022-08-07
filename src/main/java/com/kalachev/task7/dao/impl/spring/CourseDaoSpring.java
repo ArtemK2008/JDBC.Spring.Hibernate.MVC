@@ -9,11 +9,9 @@ import com.kalachev.task7.dao.impl.spring.row_mappers.CourseRowMapper;
 import com.kalachev.task7.dao.impl.spring.row_mappers.StudentRowMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Component;
 
-@Primary
 @Component
 public class CourseDaoSpring implements CoursesDao {
   @Autowired

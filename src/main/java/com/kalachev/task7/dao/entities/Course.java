@@ -1,28 +1,35 @@
 package com.kalachev.task7.dao.entities;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-@Entity(name = "courses")
+@Entity(name = "hcourses")
 public class Course {
 
   @Id
-  @GeneratedValue
-  @Column(name = "course_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "course_id", nullable = false)
   private int id;
   @Column(name = "course_name")
   private String courseName;
   @Column(name = "course_description")
   private String courseDescription;
-  @ManyToMany(mappedBy = "courses")
-  private List<Student> students = new ArrayList<>();
+
+  @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
+  private Set<Student> students = new HashSet<>();
+
+  public Course() {
+    super();
+  }
 
   public int getId() {
     return id;
@@ -48,11 +55,11 @@ public class Course {
     this.courseDescription = courseDescription;
   }
 
-  public List<Student> getStudents() {
+  public Set<Student> getStudents() {
     return students;
   }
 
-  public void setStudents(List<Student> students) {
+  public void setStudents(Set<Student> students) {
     this.students = students;
   }
 
