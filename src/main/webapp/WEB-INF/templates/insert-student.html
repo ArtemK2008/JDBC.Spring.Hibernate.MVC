@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>add student</title>
+<link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+	<form method="POST" th:action="@{/add-student}" th:object="${student}">
+		<table>
+			<tr>
+				<td>First Name:</td>
+				<td><input type="text" th:name="firstName"
+					th:field="*{firstName}" value="Enter first name" /></td>
+			</tr>
+			<tr>
+				<td>Last Name</td>
+				<td><input type="text" th:name="lastName"
+					th:field="*{lastName}" value="Enter Last Name" /></td>
+			</tr>
+			<tr>
+				<td>group id</td>
+				<td><input type="text" th:name="groupId" th:field="*{groupId}"
+					value="Enter ID" /></td>
+			</tr>
+			<tr>
+				<td><button type="submit">Submit</button></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

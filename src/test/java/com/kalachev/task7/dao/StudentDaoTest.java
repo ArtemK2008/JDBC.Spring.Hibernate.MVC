@@ -114,12 +114,12 @@ class StudentDaoTest extends DbUnitConfig {
     Student marina = new Student();
     marina.setFirstName("marina");
     marina.setLastName("marinova");
-    marina.setGroupdId(4);
+    marina.setGroupId(4);
     marina.setId(9);
     Student lena = new Student();
     lena.setFirstName("lena");
     lena.setLastName("lenova");
-    lena.setGroupdId(5);
+    lena.setGroupId(5);
     lena.setId(10);
     expected.add(marina);
     expected.add(lena);

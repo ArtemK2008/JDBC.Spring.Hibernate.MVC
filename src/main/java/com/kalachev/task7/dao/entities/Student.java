@@ -4,8 +4,10 @@ import java.util.Objects;
 
 public class Student {
   private int id;
-  private int groupdId;
+  private int groupId;
+
   private String firstName;
+
   private String lastName;
 
   public int getId() {
@@ -16,12 +18,12 @@ public class Student {
     this.id = id;
   }
 
-  public int getGroupdId() {
-    return groupdId;
+  public int getGroupId() {
+    return groupId;
   }
 
-  public void setGroupdId(int groupdId) {
-    this.groupdId = groupdId;
+  public void setGroupId(int groupId) {
+    this.groupId = groupId;
   }
 
   public String getFirstName() {
@@ -62,7 +64,7 @@ public class Student {
 
   @Override
   public String toString() {
-    return "Student [id=" + id + ", groupdId=" + groupdId + ", firstName="
+    return "Student [id=" + id + ", groupdId=" + groupId + ", firstName="
         + firstName + ", lastName=" + lastName + "]";
   }
 

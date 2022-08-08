@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>add student to course</title>
+<link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"></link>
+</head>
+<body>
+<div th:if="${empty != null}">
+		<h1>
+			<span th:text="${empty}"></span>
+		</h1>
+	</div>
+	
+	<div th:if="${empty == null}">
+		<h1>enter student and course you want him to be added</h1>
+
+		<form action="#" method="POST" th:action="@{/add-student-to-course}"
+			th:object="${courseList}">
+			<input type="text" th:name="studentId" placeholder="Enter ID"   />
+			<select name="courseName" th:object="${courseList}">
+				<option th:each="course : ${courseList}" th:value="${course}"
+					th:name="${course}" th:text="${course}"></option>
+			</select> <input type="submit" value="Add" />
+		</form>
+	</div>
+	
+</body>
+</html>

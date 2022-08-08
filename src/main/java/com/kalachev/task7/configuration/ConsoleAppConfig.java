@@ -9,10 +9,13 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.kalachev.task7.ComponentScanInterface;
 import com.kalachev.task7.service.CoursesOptions;
@@ -29,7 +32,9 @@ import com.kalachev.task7.ui.commands.impl.RemoveFromCourseCommand;
 
 @Configuration
 @PropertySource("classpath:DbProperties")
-@ComponentScan(basePackageClasses = { ComponentScanInterface.class })
+@ComponentScan(basePackageClasses = {
+    ComponentScanInterface.class }, excludeFilters = {
+        @Filter(type = FilterType.ANNOTATION, value = EnableWebMvc.class) })
 public class ConsoleAppConfig {
 
   @Bean
