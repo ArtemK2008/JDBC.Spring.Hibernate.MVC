@@ -1,90 +1,49 @@
 package com.kalachev.task7.dao;
 
-import java.io.FileInputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbunit.Assertion;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.dao.entities.Student;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.dao.entities.Student;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
-class StudentDaoTest extends DbUnitConfig {
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
+    DbUnitTestExecutionListener.class })
+class StudentDaoTest {
+
   @Autowired
   StudentsDao studentsDao;
 
-  @Override
-  @BeforeEach
-  public void setUp() throws Exception {
-    super.setUp();
-    beforeData = new FlatXmlDataSetBuilder()
-        .build(new FileInputStream(getClass().getClassLoader()
-            .getResource("dao/student/ActualStudentDataSet.xml").getFile()));
-    databaseTester.setDataSet(beforeData);
-    databaseTester.onSetup();
-  }
-
   @Test
-  void testDataSetEmptySchema_shouldHaveEqualTables_thenDatasetCreated()
-      throws Exception {
-    // given
-    IDataSet expectedDataSet = getDataSet();
-    ITable expectedTable = expectedDataSet.getTable("students");
-    // when
-    IDataSet databaseDataSet = getConnection().createDataSet();
-    ITable actualTable = databaseDataSet.getTable("students");
-    // then
-    Assertion.assertEquals(expectedTable, actualTable);
-  }
-
-  @Test
+  @DatabaseSetup("/dao/student/ActualStudentDataSetHibernate.xml")
+  @ExpectedDatabase(assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED, value = "/dao/student/ExpectedInsertStudentDataSetHibernate.xml")
   void testDaoImpl_whenInsert_thenNewStudentShouldBeAdded()
       throws SQLException, Exception {
-    // given
-    IDataSet expectedData = new FlatXmlDataSetBuilder()
-        .build(new FileInputStream(getClass().getClassLoader()
-            .getResource("dao/student/ExpectedInsertStudentDataSet.xml")
-            .getFile()));
-    ITable expectedTable = expectedData.getTable("students");
-    // when
     studentsDao.insert("artem", "artemov", 6);
-    IDataSet actualData = databaseTester.getConnection().createDataSet();
-    ITable actualTable = actualData.getTable("students");
-    String[] excludedColumns = { "student_id" };
-    // then
-    Assertion.assertEqualsIgnoreCols(expectedTable, actualTable,
-        excludedColumns);
   }
 
   @Test
+  @DatabaseSetup("/dao/student/ExpectedInsertStudentDataSetHibernate.xml")
+  @ExpectedDatabase(assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED, value = "/dao/student/ActualInsertStudentDataSetHibernate.xml")
   void testDaoImpl_whenDelete_thenStudentNoLongerInTable()
       throws SQLException, Exception {
-    // given
-    IDataSet expectedData = new FlatXmlDataSetBuilder()
-        .build(new FileInputStream(getClass().getClassLoader()
-            .getResource("dao/student/ExpectedDeleteStudentDataSet.xml")
-            .getFile()));
-    ITable expectedTable = expectedData.getTable("students");
-    // when
-    studentsDao.delete(10);
-    IDataSet actualData = databaseTester.getConnection().createDataSet();
-    ITable actualTable = actualData.getTable("students");
-    // then
-    Assertion.assertEquals(expectedTable, actualTable);
+    studentsDao.delete(1);
   }
 
   @Test

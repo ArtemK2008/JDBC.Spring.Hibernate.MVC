@@ -1,47 +1,40 @@
 package com.kalachev.task7.hibernate;
 
-import com.kalachev.task7.dao.entities.Course;
-import com.kalachev.task7.dao.entities.Student;
+import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.dao.entities.Group;
+import com.kalachev.task7.dao.impl.hibernate.GroupsDaoHibernate;
+import com.kalachev.task7.initialization.impl.hibernate.InitializerHibernate;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class HibernateStudy {
 
   public static void main(String[] args) {
 
-    Course course = new Course();
-    course.setCourseDescription("discr");
-    course.setCourseName("course 1");
+    ApplicationContext context = new AnnotationConfigApplicationContext(
+        ConsoleAppConfig.class);
 
-    Student leha = new Student();
-    leha.setFirstName("leha");
-    leha.setLastName("Lehov");
-    leha.setGroupId(3);
+    InitializerHibernate test = (InitializerHibernate) context
+        .getBean("initializerHibernate");
+    test.initializeTables();
+    GroupsDaoHibernate groupsDaoHibernate = (GroupsDaoHibernate) context
+        .getBean("groupsDaoHibernate");
 
-    course.getStudents().add(leha);
-    leha.getCourses().add(course);
+    List<Group> groups = groupsDaoHibernate.findBySize(5);
+    System.out.println();
+    List<Group> groups1 = groupsDaoHibernate.findBySize(15);
+    System.out.println();
+    List<Group> groups2 = groupsDaoHibernate.findBySize(25);
+    System.out.println();
+    List<Group> groups3 = groupsDaoHibernate.findBySize(35);
+    System.out.println();
+    List<Group> groups4 = groupsDaoHibernate.findBySize(17);
 
-    Transaction transaction = null;
-
-    Configuration configuration = new Configuration().configure()
-        .addAnnotatedClass(Student.class).addAnnotatedClass(Course.class);
-
-    ServiceRegistry registry = new StandardServiceRegistryBuilder()
-        .applySettings(configuration.getProperties()).build();
-
-    SessionFactory factory = configuration.buildSessionFactory(registry);
-
-    try (Session session = factory.openSession()) {
-      transaction = session.beginTransaction();
-      session.save(leha);
-      session.save(course);
-      transaction.commit();
-    }
+    ((ConfigurableApplicationContext) context).close();
 
   }
 

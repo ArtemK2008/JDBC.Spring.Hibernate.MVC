@@ -19,7 +19,7 @@ import javax.persistence.SequenceGenerator;
 @Entity(name = "hstudents")
 public class Student {
   @Id
-  @SequenceGenerator(name = "student_seq", sequenceName = "student_sequence", initialValue = 1, allocationSize = 5)
+  @SequenceGenerator(name = "student_seq", sequenceName = "student_sequence", initialValue = 1, allocationSize = 25)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
   @Column(name = "student_id")
   private int id;
@@ -35,7 +35,7 @@ public class Student {
           @JoinColumn(name = "course_id") })
   private Set<Course> courses = new HashSet<>();
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "group_id", nullable = false, updatable = false, insertable = false)
   private Group group;
 

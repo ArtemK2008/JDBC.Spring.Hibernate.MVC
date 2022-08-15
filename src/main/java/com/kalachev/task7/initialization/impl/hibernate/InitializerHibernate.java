@@ -10,6 +10,7 @@ import com.kalachev.task7.initialization.GroupInitializer;
 import com.kalachev.task7.initialization.Initializer;
 import com.kalachev.task7.initialization.StudentInitializer;
 import com.kalachev.task7.initialization.tables.hiberate.CoursesDataHibernatePopulator;
+import com.kalachev.task7.initialization.tables.hiberate.DatabaseCleaner;
 import com.kalachev.task7.initialization.tables.hiberate.GroupsDataHibernatePopulator;
 import com.kalachev.task7.initialization.tables.hiberate.StudentsDataHibernatePopulator;
 import com.kalachev.task7.initialization.tables.hiberate.StudentsToCoursesHibernatePopulator;
@@ -41,6 +42,8 @@ public class InitializerHibernate implements Initializer {
   StudentsDaoHibernate studentsDaoHibernate;
   @Autowired
   StudentsToCoursesHibernatePopulator manyToManyPopulator;
+  @Autowired
+  DatabaseCleaner cleaner;
 
   public InitializerHibernate(StudentInitializer studentInitializerImpl,
       CoursesInitializer coursesInitializerImpl,
@@ -58,6 +61,7 @@ public class InitializerHibernate implements Initializer {
   }
 
   public void initializeTables() {
+    cleaner.clearAllTables();
     generateStudentData();
     fillGroupsTable(groups);
     fillStudentsTable(students, groups);

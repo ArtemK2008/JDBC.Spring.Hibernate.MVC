@@ -2,3 +2,5 @@ URL = jdbc:h2:~/test
 NAME = sa
 PASSWORD = 
 JDBC_DRIVER = org.h2.Driver
+DIALECT = org.hibernate.dialect.H2Dialect
+DLL-MODE = create

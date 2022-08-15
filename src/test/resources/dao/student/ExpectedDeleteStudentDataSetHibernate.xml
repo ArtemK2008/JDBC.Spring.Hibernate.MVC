@@ -19,17 +19,4 @@
  course_name = 'Mandarin' course_description = '-'/>
  <studentscoursesdata student_id = '10' group_id = '5' first_name = 'lena' last_name = 'lenova'
  course_name = 'Mandarin' course_description = '-'/>
- <studentscoursesdata student_id = '10' group_id = '5' first_name = 'lena' last_name = 'lenova'
- course_name = 'Arabic' course_description = '-'/>
- <studentscoursesdata student_id = '10' group_id = '5' first_name = 'lena' last_name = 'lenova'
- course_name = 'English' course_description = '-'/>
- <studentscoursesdata student_id = '5' group_id = '5' first_name = 'aleksandr' last_name = 'aleksandrov'
- course_name = 'Arabic' course_description = '-'/>
- 
- <courses course_name = 'Russian' course_description = '-' />
- <courses course_name = 'Ukrainian' course_description = '-' />
- <courses course_name = 'Mandarin' course_description = '-' />
- <courses course_name = 'English' course_description = '-' />
- <courses course_name = 'Arabic' course_description = '-' />
 </dataset>
-

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+<hgroups group_id = '1' group_name = 'aa-11'/>
+<hgroups group_id = '2' group_name = 'aa-22'/>
+<hgroups group_id = '3' group_name = 'aa-33'/>
+<hgroups group_id = '4' group_name = 'aa-44'/>
+<hgroups group_id = '5' group_name = 'aa-55'/>
+<hgroups group_id = '6' group_name = 'aa-66'/>
+
+<hstudents student_id = '1' group_id = '1' first_name = 'tom' last_name = 'tomov'/>
+<hstudents student_id = '2' group_id = '2' first_name = 'ivan' last_name = 'ivanov'/>
+<hstudents student_id = '3' group_id = '1' first_name = 'petr' last_name = 'petrov'/>
+<hstudents student_id = '4' group_id = '3' first_name = 'sidor' last_name = 'sidorov'/>
+<hstudents student_id = '5' group_id = '1' first_name = 'aleksandr' last_name = 'aleksandrov'/>
+<hstudents student_id = '6' group_id = '4' first_name = 'pavel' last_name = 'pavlov'/>
+<hstudents student_id = '7' group_id = '1' first_name = 'sveta' last_name = 'svetova'/>
+<hstudents student_id = '8' group_id = '5' first_name = 'liza' last_name = 'lizova'/>
+<hstudents student_id = '9' group_id = '2' first_name = 'marina' last_name = 'marinova'/>
+<hstudents student_id = '10' group_id = '2' first_name = 'lena' last_name = 'lenova'/>
+</dataset> 

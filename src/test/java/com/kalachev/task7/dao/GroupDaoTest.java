@@ -1,38 +1,34 @@
 package com.kalachev.task7.dao;
 
-import java.io.FileInputStream;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.dao.entities.Group;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.dao.entities.Group;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
-class GroupDaoTest extends DbUnitConfig {
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
+    DbUnitTestExecutionListener.class })
+class GroupDaoTest {
+
   @Autowired
   GroupsDao groupsDao;
 
-  @Override
-  @BeforeEach
-  public void setUp() throws Exception {
-    super.setUp();
-    beforeData = new FlatXmlDataSetBuilder()
-        .build(new FileInputStream(getClass().getClassLoader()
-            .getResource("dao/group/ActualGroupDataSet.xml").getFile()));
-    databaseTester.setDataSet(beforeData);
-    databaseTester.onSetup();
-  }
-
   @Test
+  @DatabaseSetup("/dao/group/ActualGroupDataSetHibernate.xml")
   void testFindBySize_shouldReturnGroupsWithAtLeastThreeStudent_whenCalledWithValidTables() {
     // given
     List<Group> expected = new LinkedList<>();

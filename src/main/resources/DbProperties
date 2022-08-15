@@ -2,3 +2,5 @@ URL = jdbc:postgresql://localhost/comkalachevtasksqljdbc
 NAME = kalachevartemsql
 PASSWORD = 1234
 JDBC_DRIVER = org.postgresql.Driver
+DIALECT = org.hibernate.dialect.PostgreSQLDialect
+DLL-MODE = update

@@ -16,18 +16,25 @@ public class DatabaseCleaner {
 
   @EventListener
   public void initializeTablesEvent(DatabaseCleanEvent event) {
-    dropAllTables();
+    clearAllTables();
   }
 
-  public void dropAllTables() {
+  public void clearAllTables() {
     Transaction transaction = null;
     try (Session session = sessionFactory.openSession()) {
       transaction = session.beginTransaction();
-      session.createNativeQuery(
-          "DROP TABLE IF EXISTS hstudents,hcourses,hgroups,hstudents_hcourses CASCADE")
+      session.createNativeQuery("DELETE FROM hstudents_hcourses")
           .executeUpdate();
-      session.createNativeQuery(
-          "DROP TABLE IF EXISTS students,courses,groups,students_courses,studentscoursesdata CASCADE")
+      session.createNativeQuery("DELETE FROM hstudents").executeUpdate();
+      session.createNativeQuery("DELETE FROM hcourses").executeUpdate();
+      session.createNativeQuery("DELETE FROM hgroups").executeUpdate();
+      session
+          .createNativeQuery("ALTER SEQUENCE student_sequence RESTART WITH 1")
+          .executeUpdate();
+      session.createNativeQuery("ALTER SEQUENCE groups_sequence RESTART WITH 1")
+          .executeUpdate();
+      session
+          .createNativeQuery("ALTER SEQUENCE courses_sequence RESTART WITH 1")
           .executeUpdate();
 
       transaction.commit();

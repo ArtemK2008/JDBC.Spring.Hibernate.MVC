@@ -14,13 +14,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
+import javax.persistence.Query;
+
+import com.kalachev.task7.configuration.ConsoleAppConfig;
+import com.kalachev.task7.dao.entities.Course;
+import com.kalachev.task7.dao.entities.Group;
+import com.kalachev.task7.dao.entities.Student;
+import com.kalachev.task7.events.InitializationEvent;
+import com.kalachev.task7.initialization.Initializer;
+import com.kalachev.task7.ui.menu.ConsoleMenu;
+import com.kalachev.task7.utilities.ConnectionManager;
+import com.kalachev.task7.utilities.JdbcUtil;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,13 +47,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.kalachev.task7.configuration.ConsoleAppConfig;
-import com.kalachev.task7.events.InitializationEvent;
-import com.kalachev.task7.initialization.Initializer;
-import com.kalachev.task7.ui.menu.ConsoleMenu;
-import com.kalachev.task7.utilities.ConnectionManager;
-import com.kalachev.task7.utilities.JdbcUtil;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ConsoleAppConfig.class)
 class ConsoleMenuIT {
@@ -50,7 +57,10 @@ class ConsoleMenuIT {
   @SpyBean
   Initializer spyInitializer;
   @Autowired
-  ApplicationEventPublisher publisher;
+  SessionFactory sessionFactory;
+  @Autowired
+  private ApplicationEventPublisher publisher;
+
   private final PrintStream standardOut = System.out;
   ByteArrayOutputStream outputStreamCaptor;
   final static String NEWLINE = System.lineSeparator();
@@ -234,7 +244,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsNotInt()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(NOT_AN_INTEGER).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -257,7 +266,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenGroupIdIsOutOfRange()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("3").thenReturn(FIRSTNAME)
         .thenReturn(LASTNAME).thenReturn(HUGE_INT).thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -280,7 +288,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldDeleteStudentFromDatabase_whenUserAsksToDelete()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     String expectedMessage = "student with id " + STUDENT_TO_DELETE_ID
         + " deleted";
     Mockito.when(mockScanner.next()).thenReturn("4")
@@ -307,7 +314,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdIsNotInt()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(NOT_AN_INTEGER)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -330,7 +336,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenIdNotExists()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("4").thenReturn(HUGE_INT)
         .thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -360,8 +365,11 @@ class ConsoleMenuIT {
     // when
     int countBefore = countStudentsInDatabase();
     int statusCode = catchSystemExit(() -> {
+      int countAfter1 = countStudentsInDatabase();
       spyMenu.runSchoolApp();
+      int countAfter2 = countStudentsInDatabase();
     });
+    int countAfter3 = countStudentsInDatabase();
     String output = outputStreamCaptor.toString().trim();
     String[] outputLines = output.split(NEWLINE);
     int countAfter = countStudentsInDatabase();
@@ -409,7 +417,6 @@ class ConsoleMenuIT {
   void testConsoleMenu_shouldPrintErrorMessage_whenCourseNameWasWrong()
       throws Exception {
     // given
-    publisher.publishEvent(new InitializationEvent(this));
     Mockito.when(mockScanner.next()).thenReturn("5").thenReturn(STUDENT_ID)
         .thenReturn(COURSE + "is worng").thenReturn(EXIT);
     Mockito.when(mockScanner.nextLine()).thenReturn("enter");
@@ -643,74 +650,65 @@ class ConsoleMenuIT {
   }
 
   private List<String> retrieveRealStudentNames(String course) {
-    Connection connection = null;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    List<String> students = new ArrayList<>();
-    final String FIND_STUDENTS = "SELECT first_name,last_name "
-        + "FROM studentscoursesdata " + "WHERE course_name = (?)";
-    try {
-      connection = ConnectionManager.openDbConnection();
-      statement = connection.prepareStatement(FIND_STUDENTS);
-      statement.setString(1, course);
-      rs = statement.executeQuery();
-      while (rs.next()) {
-        students
-            .add(rs.getString("first_name") + " " + rs.getString("last_name"));
+    List<String> foundStudents = new ArrayList<>();
+    Transaction transaction = null;
+    try (Session session = sessionFactory.openSession()) {
+      transaction = session.beginTransaction();
+      Query query = session
+          .createQuery("from hcourses where course_name=:course");
+      query.setParameter("course", course);
+      Course currentCourse = (Course) query.getSingleResult();
+      Set<Student> courseStudents = currentCourse.getStudents();
+      for (Student s : courseStudents) {
+        foundStudents.add(s.getFirstName() + " " + s.getLastName());
       }
-    } catch (SQLException e) {
-      System.out.println("Error while getting Student names from " + course);
-    } finally {
-      JdbcUtil.closeAll(rs, statement, connection);
+      transaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+      if (transaction != null) {
+        transaction.rollback();
+      }
     }
-    return students;
+    return foundStudents;
   }
 
   private List<String> retrieveGroupNamesWithCondition(String count) {
-    Connection connection = null;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    List<String> groups = new LinkedList<>();
-    final String FIND_GROUP_BY_SIZE = "SELECT g.group_name FROM Students"
-        + " as s " + "INNER JOIN Groups as g " + "ON s.group_id = g.group_id "
-        + "GROUP BY g.group_id,group_name "
-        + "HAVING COUNT (s.group_id) >= (?)";
-    try {
-      connection = ConnectionManager.openDbConnection();
-      statement = connection.prepareStatement(FIND_GROUP_BY_SIZE);
-      statement.setInt(1, Integer.parseInt(count));
-      rs = statement.executeQuery();
-      while (rs.next()) {
-        groups.add(rs.getString("group_name"));
+    List<String> groups = new ArrayList<>();
+    Transaction transaction = null;
+    try (Session session = sessionFactory.openSession()) {
+      transaction = session.beginTransaction();
+      List<Group> allGroups = session
+          .createQuery("SELECT g FROM hgroups g", Group.class).getResultList();
+      for (Group g : allGroups) {
+        if (g.getStudents().size() >= Integer.parseInt(count)) {
+          groups.add(g.getGroupName());
+        }
       }
-    } catch (SQLException e) {
-      System.out.println("Error while getting Group names with less then "
-          + count + " students");
-    } finally {
-      JdbcUtil.closeAll(rs, statement, connection);
+      transaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+      if (transaction != null) {
+        transaction.rollback();
+      }
     }
     return groups;
   }
 
   private int countStudentsInDatabase() {
-    Connection connection = null;
-    Statement statement = null;
-    ResultSet rs = null;
-    int count = 0;
-    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM STUDENTS";
-    try {
-      connection = ConnectionManager.openDbConnection();
-      statement = connection.createStatement();
-      rs = statement.executeQuery(COUNT_STUDENTS);
-      if (rs.next()) {
-        count = rs.getInt(1);
+    Transaction transaction = null;
+    long count = 0;
+    try (Session session = sessionFactory.openSession()) {
+      transaction = session.beginTransaction();
+      count = (long) session.createQuery("SELECT COUNT(s) FROM hstudents s")
+          .getSingleResult();
+      transaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+      if (transaction != null) {
+        transaction.rollback();
       }
-    } catch (SQLException e) {
-      System.out.println("Error while counting Students");
-    } finally {
-      JdbcUtil.closeAll(rs, statement, connection);
     }
-    return count;
+    return (int) count;
   }
 
   private boolean checkIfStudentExistsInDatabase(String name, String lastname) {
@@ -719,7 +717,7 @@ class ConsoleMenuIT {
     PreparedStatement statement = null;
     ResultSet rs = null;
     int count = 0;
-    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM STUDENTS WHERE first_name = (?) AND last_name = (?)";
+    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM hstudents WHERE first_name = (?) AND last_name = (?)";
     try {
       connection = ConnectionManager.openDbConnection();
       statement = connection.prepareStatement(COUNT_STUDENTS);
@@ -747,7 +745,7 @@ class ConsoleMenuIT {
     PreparedStatement statement = null;
     ResultSet rs = null;
     int count = 0;
-    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM STUDENTS WHERE student_id = (?)";
+    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM hstudents WHERE student_id = (?)";
     try {
       connection = ConnectionManager.openDbConnection();
       statement = connection.prepareStatement(COUNT_STUDENTS);
@@ -773,7 +771,7 @@ class ConsoleMenuIT {
     PreparedStatement statement = null;
     ResultSet rs = null;
     int count = 0;
-    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM studentscoursesdata WHERE student_id = (?)";
+    final String COUNT_STUDENTS = "SELECT COUNT(*) FROM hstudents_hcourses WHERE student_id = (?)";
     try {
       connection = ConnectionManager.openDbConnection();
       statement = connection.prepareStatement(COUNT_STUDENTS);
@@ -792,25 +790,21 @@ class ConsoleMenuIT {
   }
 
   private String findStudentCourse(String studentId) {
-    Connection connection = null;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    String course = "";
-    final String FIND_COURSE = "SELECT course_name FROM studentscoursesdata WHERE student_id = (?)";
-    try {
-      connection = ConnectionManager.openDbConnection();
-      statement = connection.prepareStatement(FIND_COURSE);
-      statement.setInt(1, Integer.parseInt(studentId));
-      rs = statement.executeQuery();
-      if (rs.next()) {
-        course = rs.getString(1);
+    Transaction transaction = null;
+    String randomCourse = "";
+    try (Session session = sessionFactory.openSession()) {
+      transaction = session.beginTransaction();
+      Student student = session.get(Student.class, Integer.parseInt(studentId));
+      Set<Course> courses = student.getCourses();
+      Course course = courses.iterator().next();
+      randomCourse = course.getCourseName();
+      transaction.commit();
+    } catch (Exception e) {
+      e.printStackTrace();
+      if (transaction != null) {
+        transaction.rollback();
       }
-    } catch (SQLException e) {
-      System.out.println(
-          "Error while finding any course of Student with id " + studentId);
-    } finally {
-      JdbcUtil.closeAll(rs, statement, connection);
     }
-    return course;
+    return randomCourse;
   }
 }

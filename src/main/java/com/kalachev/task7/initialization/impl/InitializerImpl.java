@@ -3,10 +3,6 @@ package com.kalachev.task7.initialization.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
 import com.kalachev.task7.dao.StudentsDao;
 import com.kalachev.task7.dao.impl.core.StudentsDaoImpl;
 import com.kalachev.task7.events.InitializationEvent;
@@ -19,6 +15,9 @@ import com.kalachev.task7.initialization.tables.CoursesDataDbPopulator;
 import com.kalachev.task7.initialization.tables.GroupsDataDbPopulator;
 import com.kalachev.task7.initialization.tables.StudentsDataDbPopulator;
 import com.kalachev.task7.initialization.tables.StudentsToCoursesDataDbPopulator;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class InitializerImpl implements Initializer {
@@ -45,10 +44,11 @@ public class InitializerImpl implements Initializer {
     this.schemaInitializerImpl = schemaInitializerImpl;
   }
 
-  @EventListener
+  // @EventListener
   @Override
   public void initializeTablesEvent(InitializationEvent event) {
-    initializeTables();
+    // initializeTables();
+
   }
 
   public void initializeTables() {

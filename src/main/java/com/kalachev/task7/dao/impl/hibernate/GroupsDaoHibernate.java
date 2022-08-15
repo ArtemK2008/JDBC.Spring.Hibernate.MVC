@@ -29,7 +29,7 @@ public class GroupsDaoHibernate implements GroupsDao {
       transaction = session.beginTransaction();
       groups = session.createQuery("SELECT g FROM hgroups g", Group.class)
           .getResultList();
-      groups = groups.stream().filter(g -> g.getStudents().size() > size)
+      groups = groups.stream().filter(g -> g.getStudents().size() >= size)
           .collect(Collectors.toList());
       transaction.commit();
     } catch (Exception e) {

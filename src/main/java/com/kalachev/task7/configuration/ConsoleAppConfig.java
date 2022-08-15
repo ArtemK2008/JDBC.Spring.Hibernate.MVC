@@ -87,11 +87,12 @@ public class ConsoleAppConfig {
 
   private final Properties hibernateProperties() {
     Properties hibernateProperties = new Properties();
-    hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create");
-    hibernateProperties.put("hibernate.jdbc.batch_size", "25");
+    hibernateProperties.setProperty("hibernate.hbm2ddl.auto",
+        env.getProperty("DLL-MODE"));
+    hibernateProperties.put("hibernate.jdbc.batch_size", "5");
     hibernateProperties.put("hibernate.show_sql", false);
     hibernateProperties.setProperty("hibernate.dialect",
-        "org.hibernate.dialect.PostgreSQLDialect");
+        env.getProperty("DIALECT"));
     return hibernateProperties;
   }
 

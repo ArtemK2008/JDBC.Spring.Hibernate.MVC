@@ -9,6 +9,7 @@ import javax.persistence.Query;
 
 import com.kalachev.task7.dao.StudentsDao;
 import com.kalachev.task7.dao.entities.Course;
+import com.kalachev.task7.dao.entities.Group;
 import com.kalachev.task7.dao.entities.Student;
 
 import org.hibernate.Session;
@@ -75,14 +76,19 @@ public class StudentsDaoHibernate implements StudentsDao {
     boolean isAdded = false;
     Transaction transaction = null;
     Student student = new Student();
-    student.setFirstName(firstName);
-    student.setLastName(lastName);
-    student.setGroupId(groupId);
     try (Session session = sessionFactory.openSession()) {
       transaction = session.beginTransaction();
+      Query query = session.createQuery("from hgroups where group_id=:groupId");
+      query.setParameter("groupId", groupId);
+      Group group = (Group) query.getSingleResult();
+      student.setFirstName(firstName);
+      student.setLastName(lastName);
+      student.setGroupId(groupId);
+      group.getStudents().add(student);
+      student.setGroup(group);
       session.save(student);
-      isAdded = true;
       transaction.commit();
+      isAdded = true;
     } catch (Exception e) {
       e.printStackTrace();
       if (transaction != null) {
@@ -99,9 +105,10 @@ public class StudentsDaoHibernate implements StudentsDao {
     try (Session session = sessionFactory.openSession()) {
       transaction = session.beginTransaction();
       Student student = session.get(Student.class, id);
+      student.getGroup().getStudents().remove(student);
       session.delete(student);
-      isDeleted = true;
       transaction.commit();
+      isDeleted = true;
     } catch (Exception e) {
       e.printStackTrace();
       if (transaction != null) {
